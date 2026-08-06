@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "ERP Brasilia Metais" },
+      { name: "description", content: "Sistema ERP de controle de estoque." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "ERP Brasilia Metais" },
+      { property: "og:description", content: "Sistema ERP de controle de estoque." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "ERP Brasilia Metais" },
+      { name: "twitter:description", content: "Sistema ERP de controle de estoque." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a3ee3223-93d8-43df-a85f-68a4f3f96b4d/id-preview-6bbfd838--a6dae8bc-5836-431a-9acd-3e6a47b54c75.lovable.app-1785976377216.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a3ee3223-93d8-43df-a85f-68a4f3f96b4d/id-preview-6bbfd838--a6dae8bc-5836-431a-9acd-3e6a47b54c75.lovable.app-1785976377216.png" },
     ],
     links: [
       {
