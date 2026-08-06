@@ -237,49 +237,62 @@ function ProdutoDetalhe() {
       </AlertDialog>
 
       <Dialog open={!!saldoLancamento} onOpenChange={(v) => !v && setSaldoLancamento(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Saldo após lançamento</DialogTitle>
-            <DialogDescription>
-              {saldoLancamento && (
-                <>
-                  {formatarData(saldoLancamento.data)} às {saldoLancamento.hora}
-                </>
-              )}
+            <DialogTitle className="text-2xl">Detalhes do lançamento</DialogTitle>
+            <DialogDescription className="sr-only">
+              Saldo anterior e saldo final do lançamento selecionado
             </DialogDescription>
           </DialogHeader>
           {saldoLancamento && saldoCalculado && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
-                <div>
-                  <div className="text-xs text-muted-foreground">Tipo</div>
-                  <div className="text-sm font-medium">
-                    <TipoBadge tipo={saldoLancamento.tipo} />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Quantidade</div>
-                  <div className="text-sm font-mono font-medium">
-                    {saldoLancamento.quantidade} {saldoLancamento.unidade}
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-lg border bg-muted/50 p-4 text-center">
-                  <div className="text-xs text-muted-foreground">Antes</div>
-                  <div className="text-2xl font-semibold">
-                    {saldoCalculado.antes}
-                  </div>
-                </div>
-                <div className="rounded-lg border bg-primary/10 p-4 text-center">
-                  <div className="text-xs text-muted-foreground">Depois</div>
-                  <div className="text-2xl font-semibold text-primary">
-                    {saldoCalculado.depois}
-                  </div>
-                </div>
-              </div>
+            <div className="overflow-x-auto py-2">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>Data</TableHead>
+                    <TableHead className="text-right">Saldo anterior</TableHead>
+                    <TableHead className="text-right">
+                      {saldoLancamento.tipo === "entrada"
+                        ? "Entrada"
+                        : saldoLancamento.tipo === "saida"
+                          ? "Saída"
+                          : "Balanço"}
+                    </TableHead>
+                    <TableHead className="text-right">Saldo final</TableHead>
+                    <TableHead>Origem</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell className="whitespace-nowrap">
+                      {formatarData(saldoLancamento.data)} {saldoLancamento.hora}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatarNumero(saldoCalculado.antes)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatarNumero(saldoLancamento.quantidade)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono font-semibold">
+                      {formatarNumero(saldoCalculado.depois)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      Lançamento manual
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           )}
+          <div className="pt-2">
+            <Button
+              variant="outline"
+              className="rounded-full px-6"
+              onClick={() => setSaldoLancamento(null)}
+            >
+              fechar <span className="ml-2 text-xs text-muted-foreground">ESC</span>
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -307,4 +320,11 @@ function TipoBadge({ tipo }: { tipo: Lancamento["tipo"] }) {
 function formatarData(iso: string) {
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
+}
+
+function formatarNumero(n: number) {
+  return n.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
