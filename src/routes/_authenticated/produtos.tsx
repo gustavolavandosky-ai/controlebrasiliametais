@@ -52,7 +52,7 @@ function ProdutosPage() {
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 flex items-center justify-between">
           <Button asChild variant="ghost">
-            <Link to="/">
+            <Link to="/estoque">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Link>

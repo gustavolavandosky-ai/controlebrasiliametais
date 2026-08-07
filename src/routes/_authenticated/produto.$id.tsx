@@ -76,7 +76,7 @@ function ProdutoDetalhe() {
       <div className="min-h-screen bg-background">
         <AppHeader title="Produto" />
         <main className="mx-auto max-w-7xl p-10 text-center text-muted-foreground">
-          Produto não encontrado. <Link to="/" className="underline">Voltar</Link>
+          Produto não encontrado. <Link to="/estoque" className="underline">Voltar</Link>
         </main>
       </div>
     );
@@ -102,7 +102,7 @@ function ProdutoDetalhe() {
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 flex items-center justify-between">
           <Button asChild variant="ghost">
-            <Link to="/">
+            <Link to="/estoque">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Link>
