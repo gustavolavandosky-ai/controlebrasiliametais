@@ -5,7 +5,6 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -27,6 +26,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -80,11 +80,25 @@ function AuthPage() {
           Entre para acessar seu estoque do celular e do computador.
         </p>
 
-        <Tabs defaultValue="entrar" className="mt-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="entrar">Entrar</TabsTrigger>
-            <TabsTrigger value="criar">Criar conta</TabsTrigger>
-          </TabsList>
+        <div className="mt-6">
+          <div className="grid grid-cols-2 gap-2 rounded-md bg-muted p-1">
+            <Button
+              type="button"
+              variant={modo === "entrar" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setModo("entrar")}
+            >
+              Entrar
+            </Button>
+            <Button
+              type="button"
+              variant={modo === "criar" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setModo("criar")}
+            >
+              Criar conta
+            </Button>
+          </div>
 
           <div className="mt-4 grid gap-3">
             <div className="grid gap-2">
@@ -109,17 +123,14 @@ function AuthPage() {
             </div>
           </div>
 
-          <TabsContent value="entrar" className="mt-4">
-            <Button className="w-full" disabled={loading} onClick={() => void entrar()}>
-              Entrar
-            </Button>
-          </TabsContent>
-          <TabsContent value="criar" className="mt-4">
-            <Button className="w-full" disabled={loading} onClick={() => void cadastrar()}>
-              Criar conta
-            </Button>
-          </TabsContent>
-        </Tabs>
+          <Button
+            className="mt-4 w-full"
+            disabled={loading}
+            onClick={() => void (modo === "entrar" ? entrar() : cadastrar())}
+          >
+            {modo === "entrar" ? "Entrar" : "Criar conta"}
+          </Button>
+        </div>
 
         <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
