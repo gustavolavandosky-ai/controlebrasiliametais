@@ -44,7 +44,7 @@ import {
 import { EntrySheet } from "@/components/EntrySheet";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/produto/$id")({
+export const Route = createFileRoute("/_authenticated/produto/$id")({
   head: () => ({ meta: [{ title: "Produto · ERP" }] }),
   component: ProdutoDetalhe,
   notFoundComponent: () => (

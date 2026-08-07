@@ -10,53 +10,57 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProdutosRouteImport } from './routes/produtos'
-import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
+import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProdutosRoute = ProdutosRouteImport.update({
-  id: '/produtos',
+const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
+  id: '/_authenticated/produtos',
   path: '/produtos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProdutoIdRoute = ProdutoIdRouteImport.update({
-  id: '/produto/$id',
+const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
+  id: '/_authenticated/produto/$id',
   path: '/produto/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/produtos': typeof ProdutosRoute
-  '/produto/$id': typeof ProdutoIdRoute
+  '/produtos': typeof AuthenticatedProdutosRoute
+  '/produto/$id': typeof AuthenticatedProdutoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/produtos': typeof ProdutosRoute
-  '/produto/$id': typeof ProdutoIdRoute
+  '/produtos': typeof AuthenticatedProdutosRoute
+  '/produto/$id': typeof AuthenticatedProdutoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/produtos': typeof ProdutosRoute
-  '/produto/$id': typeof ProdutoIdRoute
+  '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/produtos' | '/produto/$id'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/produtos' | '/produto/$id'
-  id: '__root__' | '/' | '/produtos' | '/produto/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated/produtos'
+    | '/_authenticated/produto/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProdutosRoute: typeof ProdutosRoute
-  ProdutoIdRoute: typeof ProdutoIdRoute
+  AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,18 +72,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/produtos': {
-      id: '/produtos'
+    '/_authenticated/produtos': {
+      id: '/_authenticated/produtos'
       path: '/produtos'
       fullPath: '/produtos'
-      preLoaderRoute: typeof ProdutosRouteImport
+      preLoaderRoute: typeof AuthenticatedProdutosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/produto/$id': {
-      id: '/produto/$id'
+    '/_authenticated/produto/$id': {
+      id: '/_authenticated/produto/$id'
       path: '/produto/$id'
       fullPath: '/produto/$id'
-      preLoaderRoute: typeof ProdutoIdRouteImport
+      preLoaderRoute: typeof AuthenticatedProdutoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,19 +91,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProdutosRoute: ProdutosRoute,
-  ProdutoIdRoute: ProdutoIdRoute,
+  AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

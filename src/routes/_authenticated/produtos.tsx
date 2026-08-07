@@ -25,7 +25,7 @@ import { ProductDialog } from "@/components/ProductDialog";
 import { useInventory, type Produto } from "@/lib/inventory-store";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/produtos")({
+export const Route = createFileRoute("/_authenticated/produtos")({
   head: () => ({ meta: [{ title: "Gerenciar produtos · ERP" }] }),
   component: ProdutosPage,
 });
