@@ -68,33 +68,37 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
 
   if (!produto) return null;
 
-  const salvar = () => {
+  const salvar = async () => {
     const q = parseFloat(quantidade.replace(",", "."));
     if (!isFinite(q) || q < 0) {
       toast.error("Quantidade inválida");
       return;
     }
-    if (lancamento) {
-      updateLancamento(lancamento.id, {
-        tipo,
-        quantidade: q,
-        unidade,
-        data,
-        hora,
-      });
-      toast.success("Lançamento atualizado");
-    } else {
-      addLancamento({
-        produtoId: produto.id,
-        tipo,
-        quantidade: q,
-        unidade,
-        data,
-        hora,
-      });
-      toast.success("Lançamento salvo");
+    try {
+      if (lancamento) {
+        await updateLancamento(lancamento.id, {
+          tipo,
+          quantidade: q,
+          unidade,
+          data,
+          hora,
+        });
+        toast.success("Lançamento atualizado");
+      } else {
+        await addLancamento({
+          produtoId: produto.id,
+          tipo,
+          quantidade: q,
+          unidade,
+          data,
+          hora,
+        });
+        toast.success("Lançamento salvo");
+      }
+      onOpenChange(false);
+    } catch (err) {
+      toast.error("Erro ao salvar: " + (err as Error).message);
     }
-    onOpenChange(false);
   };
 
   return (
@@ -162,7 +166,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
             </div>
           </div>
 
-          <Button onClick={salvar} className="mt-2 w-full">
+          <Button onClick={() => void salvar()} className="mt-2 w-full">
             Salvar
           </Button>
         </div>

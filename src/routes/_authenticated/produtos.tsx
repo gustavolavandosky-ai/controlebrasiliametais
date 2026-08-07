@@ -25,8 +25,8 @@ import { ProductDialog } from "@/components/ProductDialog";
 import { useInventory, type Produto } from "@/lib/inventory-store";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/produtos")({
-  head: () => ({ meta: [{ title: "Gerenciar produtos · ERP" }] }),
+export const Route = createFileRoute("/_authenticated/produtos")({
+  head: () => ({ meta: [{ title: "Gerenciar produtos · ERP Estoque" }, { name: "description", content: "Cadastre, edite e organize os produtos do seu estoque." }, { property: "og:title", content: "Gerenciar produtos · ERP Estoque" }, { property: "og:description", content: "Cadastre, edite e organize os produtos do seu estoque." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ProdutosPage,
 });
 
@@ -52,7 +52,7 @@ function ProdutosPage() {
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 flex items-center justify-between">
           <Button asChild variant="ghost">
-            <Link to="/">
+            <Link to="/estoque">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Link>

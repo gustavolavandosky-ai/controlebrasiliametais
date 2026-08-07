@@ -44,8 +44,8 @@ import {
 import { EntrySheet } from "@/components/EntrySheet";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/produto/$id")({
-  head: () => ({ meta: [{ title: "Produto · ERP" }] }),
+export const Route = createFileRoute("/_authenticated/produto/$id")({
+  head: () => ({ meta: [{ title: "Produto · ERP Estoque" }, { name: "description", content: "Histórico de entradas, saídas e balanços do produto." }, { property: "og:title", content: "Produto · ERP Estoque" }, { property: "og:description", content: "Histórico de entradas, saídas e balanços do produto." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ProdutoDetalhe,
   notFoundComponent: () => (
     <div className="p-10 text-center text-muted-foreground">
@@ -76,7 +76,7 @@ function ProdutoDetalhe() {
       <div className="min-h-screen bg-background">
         <AppHeader title="Produto" />
         <main className="mx-auto max-w-7xl p-10 text-center text-muted-foreground">
-          Produto não encontrado. <Link to="/" className="underline">Voltar</Link>
+          Produto não encontrado. <Link to="/estoque" className="underline">Voltar</Link>
         </main>
       </div>
     );
@@ -102,7 +102,7 @@ function ProdutoDetalhe() {
       <main className="mx-auto max-w-7xl px-6 py-6">
         <div className="mb-6 flex items-center justify-between">
           <Button asChild variant="ghost">
-            <Link to="/">
+            <Link to="/estoque">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Link>

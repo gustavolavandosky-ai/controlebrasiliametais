@@ -46,7 +46,7 @@ function normalizarUnidade(val: string | undefined): Unidade | "" {
 }
 
 export function ImportDialog({ open, onOpenChange }: Props) {
-  const { addProduto, addLancamento } = useInventory();
+  const { importarProdutos } = useInventory();
   const [preview, setPreview] = useState<RowPreview[]>([]);
   const [fileName, setFileName] = useState("");
   const [importarInicial, setImportarInicial] = useState(true);
@@ -141,7 +141,7 @@ export function ImportDialog({ open, onOpenChange }: Props) {
     reader.readAsBinaryString(file);
   };
 
-  const confirmar = () => {
+  const confirmar = async () => {
     const validos = preview.filter((r) => r.valido);
     if (validos.length === 0) {
       toast.error("Nenhuma linha válida para importar");
@@ -149,38 +149,21 @@ export function ImportDialog({ open, onOpenChange }: Props) {
     }
 
     let criados = 0;
-    for (const row of validos) {
-      const unidade = (row.unidade as Unidade) || "un";
-      addProduto({
-        nome: row.nome,
-        unidade,
-        estoqueInicial: 0,
-        localizacao: row.localizacao,
-        observacoes: row.observacoes,
-      });
-      criados++;
-    }
-
-    if (importarInicial) {
-      const state = useInventory.getState();
-      const produtosAtuais = state.produtos;
-      for (const row of validos) {
-        const produto = produtosAtuais.find(
-          (p) => p.nome === row.nome && p.localizacao === row.localizacao,
-        );
-        if (produto && row.estoqueInicial !== 0) {
-          addLancamento({
-            produtoId: produto.id,
-            tipo: "balanco",
-            quantidade: row.estoqueInicial,
-            unidade: (row.unidade as Unidade) || "un",
-            data: new Date().toISOString().slice(0, 10),
-            hora: `${String(new Date().getHours()).padStart(2, "0")}:${String(
-              new Date().getMinutes(),
-            ).padStart(2, "0")}`,
-          });
-        }
-      }
+    try {
+      criados = await importarProdutos(
+        validos.map((row) => ({
+          nome: row.nome,
+          unidade: ((row.unidade as Unidade) || "un") as Unidade,
+          estoqueInicial: 0,
+          localizacao: row.localizacao,
+          observacoes: row.observacoes,
+          saldoInicial: row.estoqueInicial,
+        })),
+        importarInicial,
+      );
+    } catch (err) {
+      toast.error("Erro ao importar: " + (err as Error).message);
+      return;
     }
 
     toast.success(`${criados} produto(s) importado(s)`);
@@ -268,7 +251,7 @@ export function ImportDialog({ open, onOpenChange }: Props) {
           <Button variant="outline" onClick={cancelar}>
             Cancelar
           </Button>
-          <Button onClick={confirmar} disabled={preview.filter((r) => r.valido).length === 0}>
+          <Button onClick={() => void confirmar()} disabled={preview.filter((r) => r.valido).length === 0}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Importar {preview.filter((r) => r.valido).length > 0 ? `(${preview.filter((r) => r.valido).length})` : ""}
           </Button>

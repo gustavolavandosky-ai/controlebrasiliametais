@@ -56,7 +56,7 @@ export function ProductDialog({ produto, open, onOpenChange }: Props) {
     }
   }, [open, produto]);
 
-  const salvar = () => {
+  const salvar = async () => {
     if (!nome.trim()) {
       toast.error("Informe o nome do produto");
       return;
@@ -69,14 +69,18 @@ export function ProductDialog({ produto, open, onOpenChange }: Props) {
       observacoes: observacoes.trim(),
       localizacao: localizacao.trim(),
     };
-    if (produto) {
-      updateProduto(produto.id, payload);
-      toast.success("Produto atualizado");
-    } else {
-      addProduto(payload);
-      toast.success("Produto cadastrado");
+    try {
+      if (produto) {
+        await updateProduto(produto.id, payload);
+        toast.success("Produto atualizado");
+      } else {
+        await addProduto(payload);
+        toast.success("Produto cadastrado");
+      }
+      onOpenChange(false);
+    } catch (err) {
+      toast.error("Erro ao salvar: " + (err as Error).message);
     }
-    onOpenChange(false);
   };
 
   return (
@@ -144,7 +148,7 @@ export function ProductDialog({ produto, open, onOpenChange }: Props) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={salvar}>Salvar</Button>
+          <Button onClick={() => void salvar()}>Salvar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
