@@ -170,7 +170,7 @@ function Index() {
                   </TableCell>
                   <TableCell>
                     <Link
-                      to="/_authenticated/produto/$id"
+                      to="/produto/$id"
                       params={{ id: p.id }}
                       className="font-medium text-foreground underline-offset-4 hover:underline"
                     >

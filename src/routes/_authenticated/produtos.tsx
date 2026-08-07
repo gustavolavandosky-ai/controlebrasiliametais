@@ -26,7 +26,7 @@ import { useInventory, type Produto } from "@/lib/inventory-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produtos")({
-  head: () => ({ meta: [{ title: "Gerenciar produtos · ERP" }] }),
+  head: () => ({ meta: [{ title: "Gerenciar produtos · ERP Estoque" }, { name: "description", content: "Cadastre, edite e organize os produtos do seu estoque." }, { property: "og:title", content: "Gerenciar produtos · ERP Estoque" }, { property: "og:description", content: "Cadastre, edite e organize os produtos do seu estoque." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ProdutosPage,
 });
 

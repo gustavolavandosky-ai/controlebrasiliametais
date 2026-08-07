@@ -45,7 +45,7 @@ import { EntrySheet } from "@/components/EntrySheet";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produto/$id")({
-  head: () => ({ meta: [{ title: "Produto · ERP" }] }),
+  head: () => ({ meta: [{ title: "Produto · ERP Estoque" }, { name: "description", content: "Histórico de entradas, saídas e balanços do produto." }, { property: "og:title", content: "Produto · ERP Estoque" }, { property: "og:description", content: "Histórico de entradas, saídas e balanços do produto." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: ProdutoDetalhe,
   notFoundComponent: () => (
     <div className="p-10 text-center text-muted-foreground">
