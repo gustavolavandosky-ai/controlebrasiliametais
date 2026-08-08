@@ -7,6 +7,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
   const [unidade, setUnidade] = useState<Unidade>("un");
   const [data, setData] = useState(nowDate());
   const [hora, setHora] = useState(nowTime());
+  const [observacao, setObservacao] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -57,12 +59,14 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setUnidade(lancamento.unidade);
       setData(lancamento.data);
       setHora(lancamento.hora);
+      setObservacao(lancamento.observacao ?? "");
     } else if (produto) {
       setTipo("entrada");
       setQuantidade("");
       setUnidade(produto.unidade);
       setData(nowDate());
       setHora(nowTime());
+      setObservacao("");
     }
   }, [open, produto, lancamento]);
 
@@ -82,6 +86,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
           unidade,
           data,
           hora,
+          observacao,
         });
         toast.success("Lançamento atualizado");
       } else {
@@ -92,6 +97,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
           unidade,
           data,
           hora,
+          observacao,
         });
         toast.success("Lançamento salvo");
       }
@@ -164,6 +170,17 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
               <Label htmlFor="lancamento-hora">Horário</Label>
               <Input id="lancamento-hora" type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
             </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="lancamento-observacao">Observação</Label>
+            <Textarea
+              id="lancamento-observacao"
+              value={observacao}
+              onChange={(e) => setObservacao(e.target.value)}
+              placeholder="Ex: nota fiscal, motivo do ajuste, responsável..."
+              rows={3}
+            />
           </div>
 
           <Button onClick={() => void salvar()} className="mt-2 w-full">
