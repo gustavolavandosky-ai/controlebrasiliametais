@@ -27,6 +27,7 @@ function AuthPage() {
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [modo, setModo] = useState<"entrar" | "criar">("entrar");
+  const [nome, setNome] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -50,7 +51,10 @@ function AuthPage() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
-      options: { emailRedirectTo: window.location.origin },
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { full_name: nome.trim() },
+      },
     });
     setLoading(false);
     if (error) {
@@ -101,6 +105,17 @@ function AuthPage() {
           </div>
 
           <div className="mt-4 grid gap-3">
+            {modo === "criar" && (
+              <div className="grid gap-2">
+                <Label htmlFor="auth-nome">Nome</Label>
+                <Input
+                  id="auth-nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Seu nome"
+                />
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="auth-email">E-mail</Label>
               <Input

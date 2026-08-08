@@ -18,6 +18,13 @@ export function AppHeader({ title }: { title: string }) {
     navigate({ to: "/auth", replace: true });
   };
 
+  const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+  const nome =
+    (typeof meta['full_name'] === "string" && (meta['full_name'] as string)) ||
+    (typeof meta['name'] === "string" && (meta['name'] as string)) ||
+    (user?.email ? user.email.split("@")[0] : "") ||
+    "";
+
   return (
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
@@ -29,7 +36,7 @@ export function AppHeader({ title }: { title: string }) {
         </Link>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm font-medium text-foreground sm:inline">
-            {user?.email ?? ""}
+            {nome}
           </span>
           <Button variant="ghost" size="sm" onClick={() => void sair()}>
             <LogOut className="mr-2 h-4 w-4" />

@@ -15,6 +15,7 @@ export interface Lancamento {
   unidade: Unidade;
   data: string; // yyyy-mm-dd
   hora: string; // HH:mm
+  observacao: string;
   createdAt: number;
 }
 
@@ -68,6 +69,7 @@ async function fetchLancamentos(): Promise<Lancamento[]> {
     unidade: r.unidade as Unidade,
     data: r.data,
     hora: r.hora,
+    observacao: r.observacao ?? "",
     createdAt: new Date(r.created_at).getTime(),
   }));
 }
@@ -145,6 +147,7 @@ export function useInventory() {
         unidade: l.unidade,
         data: l.data,
         hora: l.hora,
+        observacao: l.observacao ?? "",
       });
       if (error) throw error;
       await invalidate();
@@ -162,6 +165,7 @@ export function useInventory() {
           ...(l.unidade !== undefined ? { unidade: l.unidade } : {}),
           ...(l.data !== undefined ? { data: l.data } : {}),
           ...(l.hora !== undefined ? { hora: l.hora } : {}),
+          ...(l.observacao !== undefined ? { observacao: l.observacao } : {}),
         })
         .eq("id", id);
       if (error) throw error;

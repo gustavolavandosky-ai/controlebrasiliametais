@@ -138,13 +138,14 @@ function ProdutoDetalhe() {
                 <TableHead>Tipo</TableHead>
                 <TableHead className="text-right">Quantidade</TableHead>
                 <TableHead>Unidade</TableHead>
+                <TableHead>Observação</TableHead>
                 <TableHead className="w-24 text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {lista.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
                     Nenhum lançamento ainda.
                   </TableCell>
                 </TableRow>
@@ -164,6 +165,9 @@ function ProdutoDetalhe() {
                     {l.quantidade}
                   </TableCell>
                   <TableCell>{l.unidade}</TableCell>
+                  <TableCell className="max-w-xs whitespace-pre-wrap text-muted-foreground">
+                    {l.observacao || "—"}
+                  </TableCell>
                   <TableCell
                     className="text-right"
                     onClick={(e) => e.stopPropagation()}
