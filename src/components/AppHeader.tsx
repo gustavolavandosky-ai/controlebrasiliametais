@@ -20,8 +20,8 @@ export function AppHeader({ title }: { title: string }) {
 
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const nome =
-    (typeof meta.full_name === "string" && meta.full_name) ||
-    (typeof meta.name === "string" && meta.name) ||
+    (typeof meta['full_name'] === "string" && (meta['full_name'] as string)) ||
+    (typeof meta['name'] === "string" && (meta['name'] as string)) ||
     (user?.email ? user.email.split("@")[0] : "") ||
     "";
 
