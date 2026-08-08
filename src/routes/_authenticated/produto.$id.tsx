@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator } from "lucide-react";
+import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator, Search, X } from "lucide-react";
 import {
   useInventory,
   calcularEstoque,
@@ -62,14 +64,34 @@ function ProdutoDetalhe() {
   const [editL, setEditL] = useState<Lancamento | null>(null);
   const [confirm, setConfirm] = useState<Lancamento | null>(null);
   const [saldoLancamento, setSaldoLancamento] = useState<Lancamento | null>(null);
+  const [busca, setBusca] = useState("");
+  const [dataDe, setDataDe] = useState("");
+  const [dataAte, setDataAte] = useState("");
 
-  const lista = useMemo(
+  const todos = useMemo(
     () =>
       lancamentos
         .filter((l) => l.produtoId === id)
         .sort((a, b) => b.createdAt - a.createdAt),
     [lancamentos, id],
   );
+
+  const lista = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    return todos.filter((l) => {
+      if (termo && !(l.observacao || "").toLowerCase().includes(termo)) return false;
+      if (dataDe && l.data < dataDe) return false;
+      if (dataAte && l.data > dataAte) return false;
+      return true;
+    });
+  }, [todos, busca, dataDe, dataAte]);
+
+  const temFiltro = !!(busca.trim() || dataDe || dataAte);
+  const limparFiltros = () => {
+    setBusca("");
+    setDataDe("");
+    setDataAte("");
+  };
 
   if (!produto) {
     return (
@@ -130,6 +152,56 @@ function ProdutoDetalhe() {
         </div>
 
         <div className="rounded-lg border bg-card">
+          <div className="flex flex-wrap items-end gap-3 border-b p-4">
+            <div className="min-w-[220px] flex-1">
+              <Label htmlFor="busca-obs" className="text-xs text-muted-foreground">
+                Buscar na observação
+              </Label>
+              <div className="relative mt-1">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="busca-obs"
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  placeholder="Ex.: nota fiscal, cliente..."
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="data-de" className="text-xs text-muted-foreground">
+                De
+              </Label>
+              <Input
+                id="data-de"
+                type="date"
+                value={dataDe}
+                onChange={(e) => setDataDe(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="data-ate" className="text-xs text-muted-foreground">
+                Até
+              </Label>
+              <Input
+                id="data-ate"
+                type="date"
+                value={dataAte}
+                onChange={(e) => setDataAte(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            {temFiltro && (
+              <Button variant="ghost" onClick={limparFiltros}>
+                <X className="mr-2 h-4 w-4" />
+                Limpar
+              </Button>
+            )}
+            <div className="ml-auto text-sm text-muted-foreground">
+              {lista.length} de {todos.length} lançamentos
+            </div>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -146,7 +218,9 @@ function ProdutoDetalhe() {
               {lista.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
-                    Nenhum lançamento ainda.
+                    {temFiltro
+                      ? "Nenhum lançamento encontrado com esses filtros."
+                      : "Nenhum lançamento ainda."}
                   </TableCell>
                 </TableRow>
               )}
