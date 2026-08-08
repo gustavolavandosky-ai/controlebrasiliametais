@@ -20,6 +20,7 @@ export type Database = {
           data: string
           hora: string
           id: string
+          observacao: string
           produto_id: string
           quantidade: number
           tipo: string
@@ -32,6 +33,7 @@ export type Database = {
           data?: string
           hora?: string
           id?: string
+          observacao?: string
           produto_id: string
           quantidade?: number
           tipo: string
@@ -44,6 +46,7 @@ export type Database = {
           data?: string
           hora?: string
           id?: string
+          observacao?: string
           produto_id?: string
           quantidade?: number
           tipo?: string
