@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      convites: {
+        Row: {
+          created_at: string
+          criado_por: string
+          email: string
+          id: string
+          updated_at: string
+          usado_em: string | null
+        }
+        Insert: {
+          created_at?: string
+          criado_por: string
+          email: string
+          id?: string
+          updated_at?: string
+          usado_em?: string | null
+        }
+        Update: {
+          created_at?: string
+          criado_por?: string
+          email?: string
+          id?: string
+          updated_at?: string
+          usado_em?: string | null
+        }
+        Relationships: []
+      }
       lancamentos: {
         Row: {
           created_at: string
@@ -64,6 +91,42 @@ export type Database = {
           },
         ]
       }
+      perfis: {
+        Row: {
+          created_at: string
+          dono_id: string | null
+          email: string
+          id: string
+          nome: string
+          papel: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dono_id?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          papel?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dono_id?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          papel?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           created_at: string
@@ -105,7 +168,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      pode_ver: { Args: { _dono: string }; Returns: boolean }
+      registrar_perfil: {
+        Args: never
+        Returns: {
+          created_at: string
+          dono_id: string | null
+          email: string
+          id: string
+          nome: string
+          papel: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfis"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
