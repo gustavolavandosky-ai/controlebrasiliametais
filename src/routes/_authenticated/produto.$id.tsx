@@ -44,6 +44,7 @@ import {
   type Lancamento,
 } from "@/lib/inventory-store";
 import { EntrySheet } from "@/components/EntrySheet";
+import { useAccess } from "@/hooks/use-access";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produto/$id")({
@@ -59,6 +60,7 @@ export const Route = createFileRoute("/_authenticated/produto/$id")({
 function ProdutoDetalhe() {
   const { id } = Route.useParams();
   const { produtos, lancamentos, deleteLancamento } = useInventory();
+  const { somenteLeitura } = useAccess();
   const produto = produtos.find((p) => p.id === id);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editL, setEditL] = useState<Lancamento | null>(null);
@@ -129,10 +131,12 @@ function ProdutoDetalhe() {
               Voltar
             </Link>
           </Button>
-          <Button onClick={abrirNovo}>
-            <Plus className="mr-2 h-4 w-4" />
-            Incluir lançamento
-          </Button>
+          {!somenteLeitura && (
+            <Button onClick={abrirNovo}>
+              <Plus className="mr-2 h-4 w-4" />
+              Incluir lançamento
+            </Button>
+          )}
         </div>
 
         <div className="mb-6 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-4">
@@ -227,8 +231,10 @@ function ProdutoDetalhe() {
               {lista.map((l) => (
                 <TableRow
                   key={l.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => abrirEdit(l)}
+                  className={somenteLeitura ? "" : "cursor-pointer hover:bg-muted/50"}
+                  onClick={() => {
+                    if (!somenteLeitura) abrirEdit(l);
+                  }}
                 >
                   <TableCell>{formatarData(l.data)}</TableCell>
                   <TableCell>{l.hora}</TableCell>
@@ -257,21 +263,25 @@ function ProdutoDetalhe() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => abrirEdit(l)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
+                        {!somenteLeitura && (
+                          <DropdownMenuItem onClick={() => abrirEdit(l)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => setSaldoLancamento(l)}>
                           <Calculator className="mr-2 h-4 w-4" />
                           Calcular saldo
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setConfirm(l)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
-                        </DropdownMenuItem>
+                        {!somenteLeitura && (
+                          <DropdownMenuItem
+                            onClick={() => setConfirm(l)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
