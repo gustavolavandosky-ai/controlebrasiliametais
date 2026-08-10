@@ -26,6 +26,7 @@ import {
 } from "@/lib/inventory-store";
 import { EntrySheet } from "@/components/EntrySheet";
 import { ImportDialog } from "@/components/ImportDialog";
+import { useAccess } from "@/hooks/use-access";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/estoque")({
 function Index() {
   const navigate = useNavigate();
   const { produtos, lancamentos } = useInventory();
+  const { somenteLeitura } = useAccess();
   const [busca, setBusca] = useState("");
   const [filtroLoc, setFiltroLoc] = useState<string>("__all");
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -126,15 +128,19 @@ function Index() {
             Exportar
           </Button>
 
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
-            <Upload className="mr-2 h-4 w-4" />
-            Importar
-          </Button>
+          {!somenteLeitura && (
+            <>
+              <Button variant="outline" onClick={() => setImportOpen(true)}>
+                <Upload className="mr-2 h-4 w-4" />
+                Importar
+              </Button>
 
-          <Button onClick={() => navigate({ to: "/produtos" })}>
-            <Settings2 className="mr-2 h-4 w-4" />
-            Gerenciar produtos
-          </Button>
+              <Button onClick={() => navigate({ to: "/produtos" })}>
+                <Settings2 className="mr-2 h-4 w-4" />
+                Gerenciar produtos
+              </Button>
+            </>
+          )}
         </div>
 
         <div className="rounded-lg border bg-card">
@@ -159,14 +165,16 @@ function Index() {
               {lista.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => abrirLancamento(p)}
-                      title="Incluir lançamento"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                    {!somenteLeitura && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => abrirLancamento(p)}
+                        title="Incluir lançamento"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Link

@@ -4,10 +4,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { LogOut } from "lucide-react";
+import { useAccess } from "@/hooks/use-access";
+import { LogOut, Users } from "lucide-react";
 
 export function AppHeader({ title }: { title: string }) {
   const { user } = useAuth();
+  const { isAdmin, somenteLeitura } = useAccess();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -35,6 +37,19 @@ export function AppHeader({ title }: { title: string }) {
           </span>
         </Link>
         <div className="flex items-center gap-3">
+          {somenteLeitura && (
+            <span className="hidden rounded-full border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
+              Somente leitura
+            </span>
+          )}
+          {isAdmin && (
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/acessos">
+                <Users className="mr-2 h-4 w-4" />
+                Acessos
+              </Link>
+            </Button>
+          )}
           <span className="hidden text-sm font-medium text-foreground sm:inline">
             {nome}
           </span>

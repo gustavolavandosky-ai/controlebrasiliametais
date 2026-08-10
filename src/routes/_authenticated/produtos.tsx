@@ -23,6 +23,7 @@ import {
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { ProductDialog } from "@/components/ProductDialog";
 import { useInventory, type Produto } from "@/lib/inventory-store";
+import { useAccess } from "@/hooks/use-access";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produtos")({
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/produtos")({
 
 function ProdutosPage() {
   const { produtos, deleteProduto } = useInventory();
+  const { somenteLeitura } = useAccess();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [edit, setEdit] = useState<Produto | null>(null);
   const [confirm, setConfirm] = useState<Produto | null>(null);
@@ -57,10 +59,12 @@ function ProdutosPage() {
               Voltar
             </Link>
           </Button>
-          <Button onClick={novo}>
-            <Plus className="mr-2 h-4 w-4" />
-            Cadastrar produto
-          </Button>
+          {!somenteLeitura && (
+            <Button onClick={novo}>
+              <Plus className="mr-2 h-4 w-4" />
+              Cadastrar produto
+            </Button>
+          )}
         </div>
 
         <div className="rounded-lg border bg-card">
@@ -93,16 +97,20 @@ function ProdutosPage() {
                     {p.estoqueInicial}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button size="icon" variant="ghost" onClick={() => editar(p)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setConfirm(p)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    {!somenteLeitura && (
+                      <>
+                        <Button size="icon" variant="ghost" onClick={() => editar(p)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setConfirm(p)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
