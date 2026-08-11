@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccess } from "@/hooks/use-access";
-import { LogOut, Users } from "lucide-react";
+import { LogOut, Users, Boxes, CalendarDays } from "lucide-react";
 
 export function AppHeader({ title }: { title: string }) {
   const { user } = useAuth();
@@ -37,6 +37,20 @@ export function AppHeader({ title }: { title: string }) {
           </span>
         </Link>
         <div className="flex items-center gap-3">
+          <nav className="hidden items-center gap-1 md:flex">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/estoque">
+                <Boxes className="mr-2 h-4 w-4" />
+                Estoque
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/diarias">
+                <CalendarDays className="mr-2 h-4 w-4" />
+                Diárias
+              </Link>
+            </Button>
+          </nav>
           {somenteLeitura && (
             <span className="hidden rounded-full border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
               Somente leitura
