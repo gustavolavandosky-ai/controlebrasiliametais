@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      colaboradores: {
+        Row: {
+          created_at: string
+          equipe: string | null
+          id: string
+          nome: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipe?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          equipe?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       convites: {
         Row: {
           created_at: string
@@ -38,6 +65,78 @@ export type Database = {
           id?: string
           updated_at?: string
           usado_em?: string | null
+        }
+        Relationships: []
+      }
+      destinos: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      diarias: {
+        Row: {
+          colaborador: string
+          created_at: string
+          data: string
+          destino: string
+          equipe: string | null
+          id: string
+          observacao: string
+          situacao: string
+          tipo: string
+          troco: number | null
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          colaborador: string
+          created_at?: string
+          data?: string
+          destino?: string
+          equipe?: string | null
+          id?: string
+          observacao?: string
+          situacao?: string
+          tipo?: string
+          troco?: number | null
+          updated_at?: string
+          user_id: string
+          valor?: number
+        }
+        Update: {
+          colaborador?: string
+          created_at?: string
+          data?: string
+          destino?: string
+          equipe?: string | null
+          id?: string
+          observacao?: string
+          situacao?: string
+          tipo?: string
+          troco?: number | null
+          updated_at?: string
+          user_id?: string
+          valor?: number
         }
         Relationships: []
       }
@@ -160,6 +259,33 @@ export type Database = {
           unidade?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tipos_diaria: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+          user_id: string
+          valor_padrao: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+          user_id: string
+          valor_padrao?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+          user_id?: string
+          valor_padrao?: number
         }
         Relationships: []
       }

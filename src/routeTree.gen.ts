@@ -15,6 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAcessosRouteImport } from './routes/_authenticated/acessos'
 import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedDiariasIndexRouteImport } from './routes/_authenticated/diarias.index'
+import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_authenticated/diarias.cadastros'
 import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +48,18 @@ const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDiariasIndexRoute =
+  AuthenticatedDiariasIndexRouteImport.update({
+    id: '/diarias/',
+    path: '/diarias/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDiariasCadastrosRoute =
+  AuthenticatedDiariasCadastrosRouteImport.update({
+    id: '/diarias/cadastros',
+    path: '/diarias/cadastros',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -58,7 +72,9 @@ export interface FileRoutesByFullPath {
   '/acessos': typeof AuthenticatedAcessosRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/diarias/': typeof AuthenticatedDiariasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +82,9 @@ export interface FileRoutesByTo {
   '/acessos': typeof AuthenticatedAcessosRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/diarias': typeof AuthenticatedDiariasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,14 +94,31 @@ export interface FileRoutesById {
   '/_authenticated/acessos': typeof AuthenticatedAcessosRoute
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/_authenticated/diarias/': typeof AuthenticatedDiariasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/acessos' | '/estoque' | '/produtos' | '/produto/$id'
+    | '/'
+    | '/auth'
+    | '/acessos'
+    | '/estoque'
+    | '/produtos'
+    | '/diarias/cadastros'
+    | '/produto/$id'
+    | '/diarias/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/acessos' | '/estoque' | '/produtos' | '/produto/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/acessos'
+    | '/estoque'
+    | '/produtos'
+    | '/diarias/cadastros'
+    | '/produto/$id'
+    | '/diarias'
   id:
     | '__root__'
     | '/'
@@ -92,7 +127,9 @@ export interface FileRouteTypes {
     | '/_authenticated/acessos'
     | '/_authenticated/estoque'
     | '/_authenticated/produtos'
+    | '/_authenticated/diarias/cadastros'
     | '/_authenticated/produto/$id'
+    | '/_authenticated/diarias/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/diarias/': {
+      id: '/_authenticated/diarias/'
+      path: '/diarias'
+      fullPath: '/diarias/'
+      preLoaderRoute: typeof AuthenticatedDiariasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diarias/cadastros': {
+      id: '/_authenticated/diarias/cadastros'
+      path: '/diarias/cadastros'
+      fullPath: '/diarias/cadastros'
+      preLoaderRoute: typeof AuthenticatedDiariasCadastrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produto/$id': {
       id: '/_authenticated/produto/$id'
       path: '/produto/$id'
@@ -159,14 +210,18 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAcessosRoute: typeof AuthenticatedAcessosRoute
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedDiariasCadastrosRoute: typeof AuthenticatedDiariasCadastrosRoute
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
+  AuthenticatedDiariasIndexRoute: typeof AuthenticatedDiariasIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAcessosRoute: AuthenticatedAcessosRoute,
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedDiariasCadastrosRoute: AuthenticatedDiariasCadastrosRoute,
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
+  AuthenticatedDiariasIndexRoute: AuthenticatedDiariasIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -180,13 +235,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
