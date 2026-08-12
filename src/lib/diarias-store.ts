@@ -15,6 +15,8 @@ export interface Diaria {
   situacao: Situacao;
   troco: number | null;
   observacao: string;
+  grupoId: string | null;
+  createdAt: number;
 }
 
 export interface Colaborador {
@@ -34,7 +36,15 @@ export interface Destino {
   nome: string;
 }
 
-export type DiariaInput = Omit<Diaria, "id">;
+export type DiariaInput = Omit<Diaria, "id" | "grupoId" | "createdAt"> & {
+  grupoId?: string | null;
+};
+
+export interface GrupoDiaria {
+  chave: string;
+  grupoId: string | null;
+  itens: Diaria[];
+}
 
 export const EQUIPES = ["LEO", "ADELSON", "ALMI", "GIL"] as const;
 
@@ -65,7 +75,7 @@ async function fetchDiarias(): Promise<Diaria[]> {
     .from("diarias")
     .select("*")
     .order("data", { ascending: false })
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map((r) => ({
     id: r.id,
@@ -78,7 +88,26 @@ async function fetchDiarias(): Promise<Diaria[]> {
     situacao: (r.situacao === "pago" ? "pago" : "pendente") as Situacao,
     troco: r.troco === null || r.troco === undefined ? null : Number(r.troco),
     observacao: r.observacao ?? "",
+    grupoId: (r as { grupo_id?: string | null }).grupo_id ?? null,
+    createdAt: new Date(r.created_at).getTime(),
   }));
+}
+
+export function agruparDiarias(lista: Diaria[]): GrupoDiaria[] {
+  const grupos: GrupoDiaria[] = [];
+  const porChave = new Map<string, GrupoDiaria>();
+  for (const d of lista) {
+    const chave = d.grupoId ?? d.id;
+    const existente = porChave.get(chave);
+    if (existente) {
+      existente.itens.push(d);
+    } else {
+      const g: GrupoDiaria = { chave, grupoId: d.grupoId, itens: [d] };
+      porChave.set(chave, g);
+      grupos.push(g);
+    }
+  }
+  return grupos;
 }
 
 async function fetchColaboradores(): Promise<Colaborador[]> {
@@ -143,6 +172,7 @@ export function useDiarias() {
     situacao: d.situacao,
     troco: d.troco,
     observacao: d.observacao ?? "",
+    grupo_id: d.grupoId ?? null,
   });
 
   const addDiaria = useCallback(
@@ -169,6 +199,33 @@ export function useDiarias() {
   const deleteDiaria = useCallback(
     async (id: string) => {
       const { error } = await supabase.from("diarias").delete().eq("id", id);
+      if (error) throw error;
+      await invalidate();
+    },
+    [invalidate],
+  );
+
+  const deleteDiarias = useCallback(
+    async (ids: string[]) => {
+      const { error } = await supabase.from("diarias").delete().in("id", ids);
+      if (error) throw error;
+      await invalidate();
+    },
+    [invalidate],
+  );
+
+  /** Salva um lançamento de equipe: uma linha por colaborador, com o mesmo grupo. */
+  const salvarGrupo = useCallback(
+    async (linhas: DiariaInput[], substituirIds: string[] = []) => {
+      const user_id = await requireUserId();
+      const grupoId = crypto.randomUUID();
+      if (substituirIds.length > 0) {
+        const { error } = await supabase.from("diarias").delete().in("id", substituirIds);
+        if (error) throw error;
+      }
+      const { error } = await supabase
+        .from("diarias")
+        .insert(linhas.map((l) => toRow({ ...l, grupoId }, user_id)));
       if (error) throw error;
       await invalidate();
     },
@@ -258,6 +315,8 @@ export function useDiarias() {
     addDiaria,
     updateDiaria,
     deleteDiaria,
+    deleteDiarias,
+    salvarGrupo,
     importarDiarias,
     salvarColaborador,
     salvarTipo,
