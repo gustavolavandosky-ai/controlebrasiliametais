@@ -248,10 +248,15 @@ export function useInventory() {
   };
 }
 
+/** Ordena do mais antigo para o mais novo por data + hora (empate: criação). */
+export function compararCronologico(a: Lancamento, b: Lancamento): number {
+  const ka = `${a.data} ${a.hora ?? ""}`;
+  const kb = `${b.data} ${b.hora ?? ""}`;
+  if (ka !== kb) return ka < kb ? -1 : 1;
+  return a.createdAt - b.createdAt;
+}
+
 export function calcularEstoque(
-  produto: Produto,
-  lancamentos: Lancamento[],
-): number {
   produto: Produto,
   lancamentos: Lancamento[],
 ): number {
