@@ -357,6 +357,7 @@ function DiariasPage() {
               )}
               {grupos.map((g) => {
                 const d = g.itens[0];
+                if (!d) return null;
                 const totalGrupo = g.itens.reduce((s, i) => s + i.valor, 0);
                 const trocoGrupo = g.itens.reduce(
                   (s, i) => (i.troco === null ? s : s + i.troco),
