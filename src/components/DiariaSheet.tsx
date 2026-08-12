@@ -222,6 +222,14 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
             </div>
           </div>
 
+          <p className="rounded-md bg-muted px-3 py-2 text-sm">
+            Total do lançamento:{" "}
+            <span className="font-semibold">{formatarMoeda(totalGrupo)}</span>{" "}
+            <span className="text-muted-foreground">
+              ({selecionados.length} × {formatarMoeda(valorNumero)})
+            </span>
+          </p>
+
           <div className="grid gap-2">
             <Label htmlFor="diaria-destino">Destino / cliente</Label>
             <Select value={destino} onValueChange={setDestino}>
