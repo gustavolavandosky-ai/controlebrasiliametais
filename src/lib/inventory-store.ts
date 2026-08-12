@@ -248,13 +248,21 @@ export function useInventory() {
   };
 }
 
+/** Ordena do mais antigo para o mais novo por data + hora (empate: criação). */
+export function compararCronologico(a: Lancamento, b: Lancamento): number {
+  const ka = `${a.data} ${a.hora ?? ""}`;
+  const kb = `${b.data} ${b.hora ?? ""}`;
+  if (ka !== kb) return ka < kb ? -1 : 1;
+  return a.createdAt - b.createdAt;
+}
+
 export function calcularEstoque(
   produto: Produto,
   lancamentos: Lancamento[],
 ): number {
   const lots = lancamentos
     .filter((l) => l.produtoId === produto.id)
-    .sort((a, b) => a.createdAt - b.createdAt);
+    .sort(compararCronologico);
   let saldo = produto.estoqueInicial;
   for (const l of lots) {
     if (l.tipo === "entrada") saldo += l.quantidade;
@@ -271,7 +279,7 @@ export function calcularSaldoAteLancamento(
 ): { antes: number; depois: number } {
   const lots = lancamentos
     .filter((l) => l.produtoId === produto.id)
-    .sort((a, b) => a.createdAt - b.createdAt);
+    .sort(compararCronologico);
 
   let antes = produto.estoqueInicial;
   let depois = produto.estoqueInicial;
