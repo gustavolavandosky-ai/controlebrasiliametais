@@ -254,7 +254,7 @@ export function calcularEstoque(
 ): number {
   const lots = lancamentos
     .filter((l) => l.produtoId === produto.id)
-    .sort((a, b) => a.createdAt - b.createdAt);
+    .sort(compararCronologico);
   let saldo = produto.estoqueInicial;
   for (const l of lots) {
     if (l.tipo === "entrada") saldo += l.quantidade;
@@ -271,7 +271,7 @@ export function calcularSaldoAteLancamento(
 ): { antes: number; depois: number } {
   const lots = lancamentos
     .filter((l) => l.produtoId === produto.id)
-    .sort((a, b) => a.createdAt - b.createdAt);
+    .sort(compararCronologico);
 
   let antes = produto.estoqueInicial;
   let depois = produto.estoqueInicial;
