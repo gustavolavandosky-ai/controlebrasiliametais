@@ -36,6 +36,7 @@ import {
 import {
   CORES_EQUIPE,
   EQUIPES,
+  agruparDiarias,
   formatarData,
   formatarMoeda,
   useDiarias,
@@ -81,7 +82,7 @@ function Cartao({ titulo, valor, sub }: { titulo: string; valor: string; sub?: s
 }
 
 function DiariasPage() {
-  const { diarias, colaboradores, destinos, deleteDiaria, carregando } = useDiarias();
+  const { diarias, colaboradores, destinos, deleteDiarias, carregando } = useDiarias();
   const { somenteLeitura } = useAccess();
 
   const [busca, setBusca] = useState("");
@@ -93,7 +94,7 @@ function DiariasPage() {
   const [fSituacao, setFSituacao] = useState(TODOS);
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [alvo, setAlvo] = useState<Diaria | null>(null);
+  const [alvo, setAlvo] = useState<Diaria[] | null>(null);
   const [importOpen, setImportOpen] = useState(false);
 
   const lista = useMemo(() => {
@@ -115,6 +116,8 @@ function DiariasPage() {
       return true;
     });
   }, [diarias, busca, de, ate, fColab, fEquipe, fDestino, fSituacao]);
+
+  const grupos = useMemo(() => agruparDiarias(lista), [lista]);
 
   const total = lista.reduce((s, d) => s + d.valor, 0);
   const pendente = lista
@@ -174,10 +177,10 @@ function DiariasPage() {
     toast.success("Diárias exportadas");
   };
 
-  const excluir = async (d: Diaria) => {
+  const excluir = async (itens: Diaria[]) => {
     try {
-      await deleteDiaria(d.id);
-      toast.success("Diária excluída");
+      await deleteDiarias(itens.map((i) => i.id));
+      toast.success("Lançamento excluído");
     } catch (err) {
       toast.error("Erro ao excluir: " + (err as Error).message);
     }
@@ -345,20 +348,28 @@ function DiariasPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {lista.length === 0 && (
+              {grupos.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={11} className="py-10 text-center text-muted-foreground">
                     {carregando ? "Carregando..." : "Nenhuma diária encontrada."}
                   </TableCell>
                 </TableRow>
               )}
-              {lista.map((d) => (
+              {grupos.map((g) => {
+                const d = g.itens[0];
+                const totalGrupo = g.itens.reduce((s, i) => s + i.valor, 0);
+                const trocoGrupo = g.itens.reduce(
+                  (s, i) => (i.troco === null ? s : s + i.troco),
+                  0,
+                );
+                const temTroco = g.itens.some((i) => i.troco !== null);
+                return (
                 <TableRow
-                  key={d.id}
+                  key={g.chave}
                   className={somenteLeitura ? "" : "cursor-pointer"}
                   onClick={() => {
                     if (somenteLeitura) return;
-                    setAlvo(d);
+                    setAlvo(g.itens);
                     setSheetOpen(true);
                   }}
                 >
@@ -371,11 +382,20 @@ function DiariasPage() {
                     />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">{formatarData(d.data)}</TableCell>
-                  <TableCell className="font-medium">{d.colaborador}</TableCell>
+                  <TableCell className="font-medium">
+                    {g.itens.map((i) => (
+                      <div key={i.id}>{i.colaborador}</div>
+                    ))}
+                    {g.itens.length > 1 && (
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {g.itens.length} pessoas · {formatarMoeda(d.valor)} cada
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{d.equipe || "—"}</TableCell>
                   <TableCell>{d.tipo || "—"}</TableCell>
                   <TableCell className="text-right font-mono">
-                    {formatarMoeda(d.valor)}
+                    {formatarMoeda(totalGrupo)}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{d.destino || "—"}</TableCell>
                   <TableCell>
@@ -390,7 +410,7 @@ function DiariasPage() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right font-mono">
-                    {d.troco === null ? "—" : formatarMoeda(d.troco)}
+                    {temTroco ? formatarMoeda(trocoGrupo) : "—"}
                   </TableCell>
                   <TableCell className="max-w-48 whitespace-pre-wrap text-muted-foreground">
                     {d.observacao || "—"}
@@ -406,13 +426,13 @@ function DiariasPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             onClick={() => {
-                              setAlvo(d);
+                              setAlvo(g.itens);
                               setSheetOpen(true);
                             }}
                           >
                             Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => void excluir(d)}>
+                          <DropdownMenuItem onClick={() => void excluir(g.itens)}>
                             Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -420,7 +440,8 @@ function DiariasPage() {
                     )}
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </div>
@@ -463,7 +484,7 @@ function DiariasPage() {
         </div>
       </main>
 
-      <DiariaSheet diaria={alvo} open={sheetOpen} onOpenChange={setSheetOpen} />
+      <DiariaSheet grupo={alvo} open={sheetOpen} onOpenChange={setSheetOpen} />
       <DiariasImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
