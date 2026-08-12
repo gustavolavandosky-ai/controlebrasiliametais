@@ -17,8 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   EQUIPES,
+  formatarMoeda,
   useDiarias,
   type Diaria,
   type Situacao,
@@ -26,18 +28,19 @@ import {
 import { toast } from "sonner";
 
 interface Props {
-  diaria: Diaria | null;
+  grupo: Diaria[] | null;
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }
 
 const SEM_EQUIPE = "__sem";
 
-export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
-  const { colaboradores, tipos, destinos, addDiaria, updateDiaria } = useDiarias();
+export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
+  const { colaboradores, tipos, destinos, salvarGrupo } = useDiarias();
+  const base = grupo?.[0] ?? null;
 
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
-  const [colaborador, setColaborador] = useState("");
+  const [selecionados, setSelecionados] = useState<string[]>([]);
   const [equipe, setEquipe] = useState(SEM_EQUIPE);
   const [tipo, setTipo] = useState("");
   const [valor, setValor] = useState("");
@@ -48,19 +51,19 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    if (diaria) {
-      setData(diaria.data);
-      setColaborador(diaria.colaborador);
-      setEquipe(diaria.equipe || SEM_EQUIPE);
-      setTipo(diaria.tipo);
-      setValor(String(diaria.valor));
-      setDestino(diaria.destino);
-      setSituacao(diaria.situacao);
-      setTroco(diaria.troco === null ? "" : String(diaria.troco));
-      setObservacao(diaria.observacao);
+    if (base && grupo) {
+      setData(base.data);
+      setSelecionados(grupo.map((g) => g.colaborador));
+      setEquipe(base.equipe || SEM_EQUIPE);
+      setTipo(base.tipo);
+      setValor(String(base.valor));
+      setDestino(base.destino);
+      setSituacao(base.situacao);
+      setTroco(base.troco === null ? "" : String(base.troco));
+      setObservacao(base.observacao);
     } else {
       setData(new Date().toISOString().slice(0, 10));
-      setColaborador("");
+      setSelecionados([]);
       setEquipe(SEM_EQUIPE);
       setTipo("");
       setValor("");
@@ -69,12 +72,16 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
       setTroco("");
       setObservacao("");
     }
-  }, [open, diaria]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, grupo]);
 
-  const escolherColaborador = (nome: string) => {
-    setColaborador(nome);
-    const c = colaboradores.find((x) => x.nome === nome);
-    if (c?.equipe) setEquipe(c.equipe);
+  const alternarColaborador = (nome: string) => {
+    setSelecionados((atual) => {
+      if (atual.includes(nome)) return atual.filter((n) => n !== nome);
+      const c = colaboradores.find((x) => x.nome === nome);
+      if (c?.equipe && atual.length === 0) setEquipe(c.equipe);
+      return [...atual, nome];
+    });
   };
 
   const escolherTipo = (nome: string) => {
@@ -83,9 +90,12 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
     if (t && !valor) setValor(String(t.valorPadrao));
   };
 
+  const valorNumero = parseFloat(valor.replace(",", ".")) || 0;
+  const totalGrupo = valorNumero * selecionados.length;
+
   const salvar = async () => {
-    if (!colaborador) {
-      toast.error("Escolha o colaborador");
+    if (selecionados.length === 0) {
+      toast.error("Escolha ao menos um colaborador");
       return;
     }
     const v = parseFloat(valor.replace(",", "."));
@@ -94,9 +104,9 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
       return;
     }
     const t = troco.trim() === "" ? null : parseFloat(troco.replace(",", "."));
-    const payload = {
+    const linhas = selecionados.map((nome) => ({
       data,
-      colaborador,
+      colaborador: nome,
       equipe: equipe === SEM_EQUIPE ? "" : equipe,
       tipo,
       valor: v,
@@ -104,15 +114,10 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
       situacao,
       troco: t !== null && isFinite(t) ? t : null,
       observacao,
-    };
+    }));
     try {
-      if (diaria) {
-        await updateDiaria(diaria.id, payload);
-        toast.success("Diária atualizada");
-      } else {
-        await addDiaria(payload);
-        toast.success("Diária lançada");
-      }
+      await salvarGrupo(linhas, grupo ? grupo.map((g) => g.id) : []);
+      toast.success(grupo ? "Lançamento atualizado" : "Lançamento registrado");
       onOpenChange(false);
     } catch (err) {
       toast.error("Erro ao salvar: " + (err as Error).message);
@@ -123,8 +128,10 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>{diaria ? "Editar diária" : "Nova diária"}</SheetTitle>
-          <SheetDescription>Controle de diárias por colaborador</SheetDescription>
+          <SheetTitle>{grupo ? "Editar lançamento" : "Novo lançamento"}</SheetTitle>
+          <SheetDescription>
+            Lance a equipe inteira de uma vez: cada colaborador recebe o mesmo valor.
+          </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 grid gap-4 px-4 pb-8">
@@ -139,19 +146,24 @@ export function DiariaSheet({ diaria, open, onOpenChange }: Props) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="diaria-colaborador">Colaborador</Label>
-            <Select value={colaborador} onValueChange={escolherColaborador}>
-              <SelectTrigger id="diaria-colaborador">
-                <SelectValue placeholder="Escolha" />
-              </SelectTrigger>
-              <SelectContent>
-                {colaboradores.map((c) => (
-                  <SelectItem key={c.id} value={c.nome}>
-                    {c.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Colaboradores da equipe ({selecionados.length})</Label>
+            <div className="max-h-56 overflow-y-auto rounded-md border p-2">
+              {colaboradores.map((c) => (
+                <label
+                  key={c.id}
+                  className="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 text-sm hover:bg-accent"
+                >
+                  <Checkbox
+                    checked={selecionados.includes(c.nome)}
+                    onCheckedChange={() => alternarColaborador(c.nome)}
+                  />
+                  <span className="flex-1">{c.nome}</span>
+                  {c.equipe && (
+                    <span className="text-xs text-muted-foreground">{c.equipe}</span>
+                  )}
+                </label>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-2">
