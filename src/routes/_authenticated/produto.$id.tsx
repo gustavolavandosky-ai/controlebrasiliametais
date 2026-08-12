@@ -41,6 +41,7 @@ import {
   useInventory,
   calcularEstoque,
   calcularSaldoAteLancamento,
+  compararCronologico,
   type Lancamento,
 } from "@/lib/inventory-store";
 import { EntrySheet } from "@/components/EntrySheet";
