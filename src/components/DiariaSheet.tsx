@@ -224,7 +224,6 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
 
           <div className="grid gap-2">
             <Label htmlFor="diaria-destino">Destino / cliente</Label>
-            <span className="sr-only">destino</span>
             <Select value={destino} onValueChange={setDestino}>
               <SelectTrigger id="diaria-destino">
                 <SelectValue placeholder="Escolha" />
