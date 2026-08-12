@@ -99,6 +99,7 @@ export type Database = {
           data: string
           destino: string
           equipe: string | null
+          grupo_id: string | null
           id: string
           observacao: string
           situacao: string
@@ -114,6 +115,7 @@ export type Database = {
           data?: string
           destino?: string
           equipe?: string | null
+          grupo_id?: string | null
           id?: string
           observacao?: string
           situacao?: string
@@ -129,6 +131,7 @@ export type Database = {
           data?: string
           destino?: string
           equipe?: string | null
+          grupo_id?: string | null
           id?: string
           observacao?: string
           situacao?: string
