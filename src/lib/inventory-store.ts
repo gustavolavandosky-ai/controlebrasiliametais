@@ -252,6 +252,9 @@ export function calcularEstoque(
   produto: Produto,
   lancamentos: Lancamento[],
 ): number {
+  produto: Produto,
+  lancamentos: Lancamento[],
+): number {
   const lots = lancamentos
     .filter((l) => l.produtoId === produto.id)
     .sort(compararCronologico);
