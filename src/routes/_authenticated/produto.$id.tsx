@@ -74,7 +74,7 @@ function ProdutoDetalhe() {
     () =>
       lancamentos
         .filter((l) => l.produtoId === id)
-        .sort((a, b) => b.createdAt - a.createdAt),
+        .sort((a, b) => compararCronologico(b, a)),
     [lancamentos, id],
   );
 
