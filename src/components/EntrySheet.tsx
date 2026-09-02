@@ -189,8 +189,12 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
             />
           </div>
 
-          <Button onClick={() => void salvar()} className="mt-2 w-full">
-            Salvar
+          <Button
+            onClick={() => void salvar()}
+            disabled={salvando}
+            className="mt-2 w-full"
+          >
+            {salvando ? "Salvando..." : "Salvar"}
           </Button>
         </div>
       </SheetContent>
