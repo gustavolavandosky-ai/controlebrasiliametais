@@ -50,6 +50,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
   const [data, setData] = useState(nowDate());
   const [hora, setHora] = useState(nowTime());
   const [observacao, setObservacao] = useState("");
+  const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -68,16 +69,19 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setHora(nowTime());
       setObservacao("");
     }
+    setSalvando(false);
   }, [open, produto, lancamento]);
 
   if (!produto) return null;
 
   const salvar = async () => {
+    if (salvando) return;
     const q = parseFloat(quantidade.replace(",", "."));
     if (!isFinite(q) || q < 0) {
       toast.error("Quantidade inválida");
       return;
     }
+    setSalvando(true);
     try {
       if (lancamento) {
         await updateLancamento(lancamento.id, {
@@ -104,6 +108,8 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       onOpenChange(false);
     } catch (err) {
       toast.error("Erro ao salvar: " + (err as Error).message);
+    } finally {
+      setSalvando(false);
     }
   };
 
@@ -183,8 +189,12 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
             />
           </div>
 
-          <Button onClick={() => void salvar()} className="mt-2 w-full">
-            Salvar
+          <Button
+            onClick={() => void salvar()}
+            disabled={salvando}
+            className="mt-2 w-full"
+          >
+            {salvando ? "Salvando..." : "Salvar"}
           </Button>
         </div>
       </SheetContent>
