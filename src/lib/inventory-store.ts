@@ -38,13 +38,28 @@ async function requireUserId(): Promise<string> {
   return data.user.id;
 }
 
+const PAGE = 1000;
+
+/** Busca todas as linhas contornando o limite padrão de 1000 do PostgREST. */
+async function fetchAll<T>(tabela: "produtos" | "lancamentos"): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from(tabela)
+      .select("*")
+      .order("created_at", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = (data ?? []) as T[];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
 async function fetchProdutos(): Promise<Produto[]> {
-  const { data, error } = await supabase
-    .from("produtos")
-    .select("*")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
-  return (data ?? []).map((r) => ({
+  const data = await fetchAll<any>("produtos");
+  return data.map((r) => ({
     id: r.id,
     nome: r.nome,
     unidade: r.unidade as Unidade,
@@ -56,12 +71,8 @@ async function fetchProdutos(): Promise<Produto[]> {
 }
 
 async function fetchLancamentos(): Promise<Lancamento[]> {
-  const { data, error } = await supabase
-    .from("lancamentos")
-    .select("*")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
-  return (data ?? []).map((r) => ({
+  const data = await fetchAll<any>("lancamentos");
+  return data.map((r) => ({
     id: r.id,
     produtoId: r.produto_id,
     tipo: r.tipo as TipoLancamento,
