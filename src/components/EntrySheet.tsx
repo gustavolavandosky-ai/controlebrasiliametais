@@ -69,6 +69,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setHora(nowTime());
       setObservacao("");
     }
+    setSalvando(false);
   }, [open, produto, lancamento]);
 
   if (!produto) return null;
