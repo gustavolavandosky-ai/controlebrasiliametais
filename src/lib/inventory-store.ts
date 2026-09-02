@@ -39,6 +39,8 @@ async function requireUserId(): Promise<string> {
 }
 
 const PAGE = 1000;
+const PRODUTOS_QUERY_KEY = ["produtos"] as const;
+const LANCAMENTOS_QUERY_KEY = ["lancamentos"] as const;
 
 /** Busca todas as linhas contornando o limite padrão de 1000 do PostgREST. */
 async function fetchAll<T>(tabela: "produtos" | "lancamentos"): Promise<T[]> {
@@ -48,6 +50,7 @@ async function fetchAll<T>(tabela: "produtos" | "lancamentos"): Promise<T[]> {
       .from(tabela)
       .select("*")
       .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
       .range(from, from + PAGE - 1);
     if (error) throw error;
     const rows = (data ?? []) as T[];
@@ -85,16 +88,36 @@ async function fetchLancamentos(): Promise<Lancamento[]> {
   }));
 }
 
+function mapLancamento(r: any): Lancamento {
+  return {
+    id: r.id,
+    produtoId: r.produto_id,
+    tipo: r.tipo as TipoLancamento,
+    quantidade: Number(r.quantidade),
+    unidade: r.unidade as Unidade,
+    data: r.data,
+    hora: r.hora,
+    observacao: r.observacao ?? "",
+    createdAt: new Date(r.created_at).getTime(),
+  };
+}
+
 export function useInventory() {
   const qc = useQueryClient();
 
-  const produtosQuery = useQuery({ queryKey: ["produtos"], queryFn: fetchProdutos });
-  const lancamentosQuery = useQuery({ queryKey: ["lancamentos"], queryFn: fetchLancamentos });
+  const produtosQuery = useQuery({ queryKey: PRODUTOS_QUERY_KEY, queryFn: fetchProdutos });
+  const lancamentosQuery = useQuery({ queryKey: LANCAMENTOS_QUERY_KEY, queryFn: fetchLancamentos });
 
-  const invalidate = useCallback(async () => {
+  const refetchInventory = useCallback(async () => {
     await Promise.all([
-      qc.invalidateQueries({ queryKey: ["produtos"] }),
-      qc.invalidateQueries({ queryKey: ["lancamentos"] }),
+      qc.refetchQueries(
+        { queryKey: PRODUTOS_QUERY_KEY, type: "all" },
+        { throwOnError: true },
+      ),
+      qc.refetchQueries(
+        { queryKey: LANCAMENTOS_QUERY_KEY, type: "all" },
+        { throwOnError: true },
+      ),
     ]);
   }, [qc]);
 
@@ -114,10 +137,10 @@ export function useInventory() {
         .select("id")
         .single();
       if (error) throw error;
-      await invalidate();
+       await refetchInventory();
       return data.id as string;
     },
-    [invalidate],
+    [refetchInventory],
   );
 
   const updateProduto = useCallback(
@@ -133,42 +156,51 @@ export function useInventory() {
         })
         .eq("id", id);
       if (error) throw error;
-      await invalidate();
+      await refetchInventory();
     },
-    [invalidate],
+    [refetchInventory],
   );
 
   const deleteProduto = useCallback(
     async (id: string) => {
       const { error } = await supabase.from("produtos").delete().eq("id", id);
       if (error) throw error;
-      await invalidate();
+      await refetchInventory();
     },
-    [invalidate],
+    [refetchInventory],
   );
 
   const addLancamento = useCallback(
     async (l: LancamentoInput) => {
       const user_id = await requireUserId();
-      const { error } = await supabase.from("lancamentos").insert({
-        user_id,
-        produto_id: l.produtoId,
-        tipo: l.tipo,
-        quantidade: l.quantidade,
-        unidade: l.unidade,
-        data: l.data,
-        hora: l.hora,
-        observacao: l.observacao ?? "",
-      });
+      const { data, error } = await supabase
+        .from("lancamentos")
+        .insert({
+          user_id,
+          produto_id: l.produtoId,
+          tipo: l.tipo,
+          quantidade: l.quantidade,
+          unidade: l.unidade,
+          data: l.data,
+          hora: l.hora,
+          observacao: l.observacao ?? "",
+        })
+        .select("*")
+        .single();
       if (error) throw error;
-      await invalidate();
+      const novo = mapLancamento(data);
+      qc.setQueryData<Lancamento[]>(LANCAMENTOS_QUERY_KEY, (atual) =>
+        atual ? [...atual.filter((item) => item.id !== novo.id), novo] : [novo],
+      );
+      await refetchInventory();
+      return novo;
     },
-    [invalidate],
+    [qc, refetchInventory],
   );
 
   const updateLancamento = useCallback(
     async (id: string, l: Partial<LancamentoInput>) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("lancamentos")
         .update({
           ...(l.tipo !== undefined ? { tipo: l.tipo } : {}),
@@ -178,20 +210,36 @@ export function useInventory() {
           ...(l.hora !== undefined ? { hora: l.hora } : {}),
           ...(l.observacao !== undefined ? { observacao: l.observacao } : {}),
         })
-        .eq("id", id);
+        .eq("id", id)
+        .select("*")
+        .single();
       if (error) throw error;
-      await invalidate();
+      const atualizado = mapLancamento(data);
+      qc.setQueryData<Lancamento[]>(LANCAMENTOS_QUERY_KEY, (atual) =>
+        atual?.map((item) => (item.id === id ? atualizado : item)),
+      );
+      await refetchInventory();
+      return atualizado;
     },
-    [invalidate],
+    [qc, refetchInventory],
   );
 
   const deleteLancamento = useCallback(
     async (id: string) => {
-      const { error } = await supabase.from("lancamentos").delete().eq("id", id);
+      const { data, error } = await supabase
+        .from("lancamentos")
+        .delete()
+        .eq("id", id)
+        .select("id")
+        .single();
       if (error) throw error;
-      await invalidate();
+      if (data.id !== id) throw new Error("Não foi possível confirmar a exclusão.");
+      qc.setQueryData<Lancamento[]>(LANCAMENTOS_QUERY_KEY, (atual) =>
+        atual?.filter((item) => item.id !== id),
+      );
+      await refetchInventory();
     },
-    [invalidate],
+    [qc, refetchInventory],
   );
 
   const importarProdutos = useCallback(
@@ -236,10 +284,10 @@ export function useInventory() {
         }
       }
 
-      await invalidate();
+      await refetchInventory();
       return (data ?? []).length;
     },
-    [invalidate],
+    [refetchInventory],
   );
 
   const produtos = useMemo(() => produtosQuery.data ?? [], [produtosQuery.data]);
