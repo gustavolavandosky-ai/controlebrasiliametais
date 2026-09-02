@@ -50,6 +50,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
   const [data, setData] = useState(nowDate());
   const [hora, setHora] = useState(nowTime());
   const [observacao, setObservacao] = useState("");
+  const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
     if (!open) return;
