@@ -71,13 +71,20 @@ async function requireUserId(): Promise<string> {
 }
 
 async function fetchDiarias(): Promise<Diaria[]> {
-  const { data, error } = await supabase
-    .from("diarias")
-    .select("*")
-    .order("data", { ascending: false })
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []).map((r) => ({
+  const PAGE = 1000;
+  const data: any[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data: rows, error } = await supabase
+      .from("diarias")
+      .select("*")
+      .order("data", { ascending: false })
+      .order("created_at", { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    data.push(...(rows ?? []));
+    if ((rows ?? []).length < PAGE) break;
+  }
+  return data.map((r) => ({
     id: r.id,
     data: r.data,
     colaborador: r.colaborador,
