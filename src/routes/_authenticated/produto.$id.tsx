@@ -66,6 +66,7 @@ function ProdutoDetalhe() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editL, setEditL] = useState<Lancamento | null>(null);
   const [confirm, setConfirm] = useState<Lancamento | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
   const [saldoLancamento, setSaldoLancamento] = useState<Lancamento | null>(null);
   const [busca, setBusca] = useState("");
   const [dataDe, setDataDe] = useState("");
@@ -300,7 +301,10 @@ function ProdutoDetalhe() {
         onOpenChange={setSheetOpen}
       />
 
-      <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
+      <AlertDialog
+        open={!!confirm}
+        onOpenChange={(v) => !v && !excluindo && setConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir lançamento?</AlertDialogTitle>
@@ -309,17 +313,25 @@ function ProdutoDetalhe() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={excluindo}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (confirm) {
-                  deleteLancamento(confirm.id);
+              disabled={excluindo}
+              onClick={async (event) => {
+                event.preventDefault();
+                if (!confirm || excluindo) return;
+                setExcluindo(true);
+                try {
+                  await deleteLancamento(confirm.id);
                   toast.success("Lançamento excluído");
+                  setConfirm(null);
+                } catch (err) {
+                  toast.error("Erro ao excluir: " + (err as Error).message);
+                } finally {
+                  setExcluindo(false);
                 }
-                setConfirm(null);
               }}
             >
-              Excluir
+              {excluindo ? "Excluindo..." : "Excluir"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

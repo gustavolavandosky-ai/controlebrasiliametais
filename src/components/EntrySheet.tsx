@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -51,6 +51,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
   const [hora, setHora] = useState(nowTime());
   const [observacao, setObservacao] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const salvandoRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -69,18 +70,20 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setHora(nowTime());
       setObservacao("");
     }
+    salvandoRef.current = false;
     setSalvando(false);
   }, [open, produto, lancamento]);
 
   if (!produto) return null;
 
   const salvar = async () => {
-    if (salvando) return;
+    if (salvandoRef.current) return;
     const q = parseFloat(quantidade.replace(",", "."));
     if (!isFinite(q) || q < 0) {
       toast.error("Quantidade inválida");
       return;
     }
+    salvandoRef.current = true;
     setSalvando(true);
     try {
       if (lancamento) {
@@ -109,12 +112,18 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
     } catch (err) {
       toast.error("Erro ao salvar: " + (err as Error).message);
     } finally {
+      salvandoRef.current = false;
       setSalvando(false);
     }
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!salvandoRef.current) onOpenChange(nextOpen);
+      }}
+    >
       <SheetContent side="right" className="w-full sm:max-w-md">
         <SheetHeader>
           <SheetTitle>
