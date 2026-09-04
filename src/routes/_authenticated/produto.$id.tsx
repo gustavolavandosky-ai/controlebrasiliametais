@@ -321,6 +321,44 @@ function ProdutoDetalhe() {
               ))}
             </TableBody>
           </Table>
+
+          {lista.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t p-4">
+              <div className="text-sm text-muted-foreground">
+                Mostrando {inicio + 1}–{inicio + paginada.length} de {lista.length}
+              </div>
+              {totalPaginas > 1 && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagina <= 1}
+                    onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  >
+                    Anterior
+                  </Button>
+                  {paginasVisiveis.map((n) => (
+                    <Button
+                      key={n}
+                      size="sm"
+                      variant={n === Math.min(pagina, totalPaginas) ? "default" : "ghost"}
+                      onClick={() => setPagina(n)}
+                    >
+                      {n}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagina >= totalPaginas}
+                    onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
