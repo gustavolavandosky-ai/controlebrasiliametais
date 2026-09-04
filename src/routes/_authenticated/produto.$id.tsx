@@ -58,6 +58,8 @@ export const Route = createFileRoute("/_authenticated/produto/$id")({
   ),
 });
 
+const POR_PAGINA = 50;
+
 function ProdutoDetalhe() {
   const { id } = Route.useParams();
   const { produtos, lancamentos, deleteLancamento } = useInventory();
