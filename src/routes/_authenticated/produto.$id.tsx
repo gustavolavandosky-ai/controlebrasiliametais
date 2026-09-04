@@ -71,6 +71,7 @@ function ProdutoDetalhe() {
   const [busca, setBusca] = useState("");
   const [dataDe, setDataDe] = useState("");
   const [dataAte, setDataAte] = useState("");
+  const [pagina, setPagina] = useState(1);
 
   const todos = useMemo(
     () =>
