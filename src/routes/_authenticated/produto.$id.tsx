@@ -90,12 +90,39 @@ function ProdutoDetalhe() {
     });
   }, [todos, busca, dataDe, dataAte]);
 
+  const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
+
+  useEffect(() => {
+    setPagina(1);
+  }, [busca, dataDe, dataAte, id]);
+
+  useEffect(() => {
+    setPagina((p) => Math.min(p, totalPaginas));
+  }, [totalPaginas]);
+
+  const inicio = (Math.min(pagina, totalPaginas) - 1) * POR_PAGINA;
+  const paginada = useMemo(
+    () => lista.slice(inicio, inicio + POR_PAGINA),
+    [lista, inicio],
+  );
+
+  const paginasVisiveis = useMemo(() => {
+    const out: number[] = [];
+    const atual = Math.min(pagina, totalPaginas);
+    let ini = Math.max(1, atual - 2);
+    const fim = Math.min(totalPaginas, ini + 4);
+    ini = Math.max(1, fim - 4);
+    for (let i = ini; i <= fim; i++) out.push(i);
+    return out;
+  }, [pagina, totalPaginas]);
+
   const temFiltro = !!(busca.trim() || dataDe || dataAte);
   const limparFiltros = () => {
     setBusca("");
     setDataDe("");
     setDataAte("");
   };
+
 
   if (!produto) {
     return (
