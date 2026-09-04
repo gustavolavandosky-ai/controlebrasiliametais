@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,6 +58,8 @@ export const Route = createFileRoute("/_authenticated/produto/$id")({
   ),
 });
 
+const POR_PAGINA = 50;
+
 function ProdutoDetalhe() {
   const { id } = Route.useParams();
   const { produtos, lancamentos, deleteLancamento } = useInventory();
@@ -71,6 +73,7 @@ function ProdutoDetalhe() {
   const [busca, setBusca] = useState("");
   const [dataDe, setDataDe] = useState("");
   const [dataAte, setDataAte] = useState("");
+  const [pagina, setPagina] = useState(1);
 
   const todos = useMemo(
     () =>
@@ -90,12 +93,39 @@ function ProdutoDetalhe() {
     });
   }, [todos, busca, dataDe, dataAte]);
 
+  const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
+
+  useEffect(() => {
+    setPagina(1);
+  }, [busca, dataDe, dataAte, id]);
+
+  useEffect(() => {
+    setPagina((p) => Math.min(p, totalPaginas));
+  }, [totalPaginas]);
+
+  const inicio = (Math.min(pagina, totalPaginas) - 1) * POR_PAGINA;
+  const paginada = useMemo(
+    () => lista.slice(inicio, inicio + POR_PAGINA),
+    [lista, inicio],
+  );
+
+  const paginasVisiveis = useMemo(() => {
+    const out: number[] = [];
+    const atual = Math.min(pagina, totalPaginas);
+    let ini = Math.max(1, atual - 2);
+    const fim = Math.min(totalPaginas, ini + 4);
+    ini = Math.max(1, fim - 4);
+    for (let i = ini; i <= fim; i++) out.push(i);
+    return out;
+  }, [pagina, totalPaginas]);
+
   const temFiltro = !!(busca.trim() || dataDe || dataAte);
   const limparFiltros = () => {
     setBusca("");
     setDataDe("");
     setDataAte("");
   };
+
 
   if (!produto) {
     return (
@@ -230,7 +260,7 @@ function ProdutoDetalhe() {
                   </TableCell>
                 </TableRow>
               )}
-              {lista.map((l) => (
+              {paginada.map((l) => (
                 <TableRow
                   key={l.id}
                   className={somenteLeitura ? "" : "cursor-pointer hover:bg-muted/50"}
@@ -291,6 +321,44 @@ function ProdutoDetalhe() {
               ))}
             </TableBody>
           </Table>
+
+          {lista.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t p-4">
+              <div className="text-sm text-muted-foreground">
+                Mostrando {inicio + 1}–{inicio + paginada.length} de {lista.length}
+              </div>
+              {totalPaginas > 1 && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagina <= 1}
+                    onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  >
+                    Anterior
+                  </Button>
+                  {paginasVisiveis.map((n) => (
+                    <Button
+                      key={n}
+                      size="sm"
+                      variant={n === Math.min(pagina, totalPaginas) ? "default" : "ghost"}
+                      onClick={() => setPagina(n)}
+                    >
+                      {n}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagina >= totalPaginas}
+                    onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
