@@ -260,7 +260,7 @@ function ProdutoDetalhe() {
                   </TableCell>
                 </TableRow>
               )}
-              {lista.map((l) => (
+              {paginada.map((l) => (
                 <TableRow
                   key={l.id}
                   className={somenteLeitura ? "" : "cursor-pointer hover:bg-muted/50"}
