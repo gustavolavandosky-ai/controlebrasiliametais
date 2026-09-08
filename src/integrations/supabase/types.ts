@@ -92,6 +92,48 @@ export type Database = {
         }
         Relationships: []
       }
+      devolucoes: {
+        Row: {
+          created_at: string
+          data: string
+          empresa: string
+          id: string
+          material: string
+          observacao: string
+          quantidade_enviada: number
+          quantidade_retornada: number
+          unidade: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          empresa?: string
+          id?: string
+          material?: string
+          observacao?: string
+          quantidade_enviada?: number
+          quantidade_retornada?: number
+          unidade?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          empresa?: string
+          id?: string
+          material?: string
+          observacao?: string
+          quantidade_enviada?: number
+          quantidade_retornada?: number
+          unidade?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       diarias: {
         Row: {
           colaborador: string

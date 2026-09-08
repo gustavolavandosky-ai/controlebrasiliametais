@@ -7,8 +7,8 @@ Nova aba "Devoluções" no sistema, ao lado de Estoque e Diárias, para registra
 - Abrir a aba **Devoluções** no menu do topo.
 - Registrar uma devolução com: data, empresa (texto livre), material (texto livre), unidade, quantidade enviada, quantidade retornada e observação.
 - Ver a **diferença** calculada sozinha (retornado − enviado):
-  - negativa em vermelho (voltou menos do que foi enviado);
-  - positiva em verde (voltou mais);
+  - negativa em vermelho (voltou a mais do que foi enviado);
+  - positiva em verde (voltou menos);
   - zero em cinza neutro.
 - Ver também o percentual de perda/impureza em relação ao enviado.
 - Filtrar por período (data de/até) e buscar por empresa, material ou observação.
@@ -16,7 +16,7 @@ Nova aba "Devoluções" no sistema, ao lado de Estoque e Diárias, para registra
 - Editar e excluir registros; quem tem acesso somente leitura apenas visualiza.
 - Lista em ordem cronológica (mais recente primeiro), 50 registros por página.
 
-As devoluções ficam em um registro próprio e **não alteram o saldo do estoque**.
+As devoluções ficam em um registro próprio e **não alteram o saldo do estoque.**
 
 ## Detalhes técnicos
 
