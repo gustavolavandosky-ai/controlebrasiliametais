@@ -152,6 +152,39 @@ function ProdutoDetalhe() {
     ? calcularSaldoAteLancamento(produto, lancamentos, saldoLancamento.id)
     : null;
 
+  const saldoRelatorio = relatorio
+    ? calcularSaldoAteLancamento(produto, lancamentos, relatorio.id)
+    : null;
+
+  const imprimirRelatorio = () => {
+    if (!relatorio || !saldoRelatorio) return;
+    const tipoLabel =
+      relatorio.tipo === "entrada" ? "Entrada" : relatorio.tipo === "saida" ? "Saída" : "Balanço";
+    const linhas: [string, string][] = [
+      ["Material", produto.nome],
+      ["Localização", produto.localizacao || "—"],
+      ["Data", `${formatarData(relatorio.data)} às ${relatorio.hora}`],
+      ["Tipo de operação", tipoLabel],
+      ["Quantidade", `${formatarNumero(relatorio.quantidade)} ${relatorio.unidade}`],
+      ["Saldo anterior", `${formatarNumero(saldoRelatorio.antes)} ${produto.unidade}`],
+      ["Saldo após o movimento", `${formatarNumero(saldoRelatorio.depois)} ${produto.unidade}`],
+      ["Estoque físico atual", `${formatarNumero(calcularEstoque(produto, lancamentos))} ${produto.unidade}`],
+      ["Observação", relatorio.observacao || "—"],
+    ];
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de lançamento</title>
+<style>body{font-family:system-ui,sans-serif;padding:40px;color:#111}h1{font-size:20px;margin:0 0 4px}p.sub{color:#666;margin:0 0 24px;font-size:13px}table{width:100%;border-collapse:collapse}td{padding:10px 8px;border-bottom:1px solid #e5e5e5;font-size:14px}td:first-child{color:#666;width:220px}td:last-child{font-weight:600}</style>
+</head><body><h1>Relatório de lançamento</h1><p class="sub">Emitido em ${new Date().toLocaleString("pt-BR")}</p>
+<table>${linhas.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table>
+<script>window.onload=function(){window.print()}<\/script></body></html>`;
+    const w = window.open("", "_blank", "width=900,height=700");
+    if (!w) {
+      toast.error("Permita pop-ups para imprimir o relatório.");
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader title={produto.nome} />
