@@ -305,6 +305,10 @@ function ProdutoDetalhe() {
                           <Calculator className="mr-2 h-4 w-4" />
                           Calcular saldo
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setRelatorio(l)}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Gerar relatório
+                        </DropdownMenuItem>
                         {!somenteLeitura && (
                           <DropdownMenuItem
                             onClick={() => setConfirm(l)}
