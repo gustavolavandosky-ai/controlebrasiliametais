@@ -502,6 +502,99 @@ function ProdutoDetalhe() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!relatorio} onOpenChange={(v) => !v && setRelatorio(null)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Relatório do lançamento</DialogTitle>
+            <DialogDescription>
+              Resumo completo do movimento e do impacto no estoque.
+            </DialogDescription>
+          </DialogHeader>
+          {relatorio && saldoRelatorio && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 p-4">
+                <div>
+                  <div className="text-xs text-muted-foreground">Material</div>
+                  <div className="text-lg font-semibold">{produto.nome}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatarData(relatorio.data)} às {relatorio.hora}
+                  </div>
+                </div>
+                <TipoBadge tipo={relatorio.tipo} />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Card
+                  label="Saldo anterior"
+                  value={`${formatarNumero(saldoRelatorio.antes)} ${produto.unidade}`}
+                />
+                <Card
+                  label={
+                    relatorio.tipo === "entrada"
+                      ? "Entrada"
+                      : relatorio.tipo === "saida"
+                        ? "Saída"
+                        : "Balanço"
+                  }
+                  value={`${formatarNumero(relatorio.quantidade)} ${relatorio.unidade}`}
+                  destaque
+                />
+                <Card
+                  label="Saldo após o movimento"
+                  value={`${formatarNumero(saldoRelatorio.depois)} ${produto.unidade}`}
+                />
+              </div>
+
+              <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-3">
+                <Info label="Localização" value={produto.localizacao || "—"} />
+                <Info label="Estoque inicial" value={formatarNumero(produto.estoqueInicial)} />
+                <Info
+                  label="Estoque físico atual"
+                  value={`${formatarNumero(calcularEstoque(produto, lancamentos))} ${produto.unidade}`}
+                />
+                <div className="sm:col-span-3">
+                  <div className="text-xs text-muted-foreground">Observação</div>
+                  <div className="whitespace-pre-wrap text-sm">
+                    {relatorio.observacao || "—"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button variant="outline" onClick={() => setRelatorio(null)}>
+                  Fechar
+                </Button>
+                <Button onClick={imprimirRelatorio}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimir / PDF
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Card({
+  label,
+  value,
+  destaque,
+}: {
+  label: string;
+  value: string;
+  destaque?: boolean;
+}) {
+  return (
+    <div
+      className={
+        "rounded-lg border p-4 " + (destaque ? "border-primary/40 bg-primary/5" : "bg-card")
+      }
+    >
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-lg font-semibold">{value}</div>
     </div>
   );
 }
