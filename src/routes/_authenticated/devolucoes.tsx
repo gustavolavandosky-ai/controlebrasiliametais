@@ -78,7 +78,9 @@ function Cartao({ titulo, valor, cor }: { titulo: string; valor: string; cor?: s
 
 function corDiferenca(v: number) {
   if (v === 0) return "var(--muted-foreground)";
-  return v > 0 ? "var(--positivo)" : "var(--negativo)";
+  // Negativo = voltou menos do que foi enviado (prejuízo) -> verde.
+  // Positivo = voltou mais do que foi enviado -> vermelho.
+  return v > 0 ? "var(--negativo)" : "var(--positivo)";
 }
 
 function DevolucoesPage() {
@@ -309,7 +311,7 @@ function DevolucoesPage() {
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              variant="destructive"
+                              className="text-destructive focus:text-destructive"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExcluir(d);

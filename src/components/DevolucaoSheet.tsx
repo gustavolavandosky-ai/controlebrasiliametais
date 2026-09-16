@@ -206,8 +206,8 @@ export function DevolucaoSheet({ devolucao, open, onOpenChange }: Props) {
                   diferenca === 0
                     ? "var(--muted-foreground)"
                     : diferenca > 0
-                      ? "var(--positivo)"
-                      : "var(--negativo)",
+                      ? "var(--negativo)"
+                      : "var(--positivo)",
               }}
             >
               {diferenca > 0 ? "+" : ""}
