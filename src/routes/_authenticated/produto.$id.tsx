@@ -36,7 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator, Search, X } from "lucide-react";
+import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator, Search, X, FileText, Printer } from "lucide-react";
 import {
   useInventory,
   calcularEstoque,
@@ -70,6 +70,7 @@ function ProdutoDetalhe() {
   const [confirm, setConfirm] = useState<Lancamento | null>(null);
   const [excluindo, setExcluindo] = useState(false);
   const [saldoLancamento, setSaldoLancamento] = useState<Lancamento | null>(null);
+  const [relatorio, setRelatorio] = useState<Lancamento | null>(null);
   const [busca, setBusca] = useState("");
   const [dataDe, setDataDe] = useState("");
   const [dataAte, setDataAte] = useState("");
@@ -150,6 +151,39 @@ function ProdutoDetalhe() {
   const saldoCalculado = saldoLancamento
     ? calcularSaldoAteLancamento(produto, lancamentos, saldoLancamento.id)
     : null;
+
+  const saldoRelatorio = relatorio
+    ? calcularSaldoAteLancamento(produto, lancamentos, relatorio.id)
+    : null;
+
+  const imprimirRelatorio = () => {
+    if (!relatorio || !saldoRelatorio) return;
+    const tipoLabel =
+      relatorio.tipo === "entrada" ? "Entrada" : relatorio.tipo === "saida" ? "Saída" : "Balanço";
+    const linhas: [string, string][] = [
+      ["Material", produto.nome],
+      ["Localização", produto.localizacao || "—"],
+      ["Data", `${formatarData(relatorio.data)} às ${relatorio.hora}`],
+      ["Tipo de operação", tipoLabel],
+      ["Quantidade", `${formatarNumero(relatorio.quantidade)} ${relatorio.unidade}`],
+      ["Saldo anterior", `${formatarNumero(saldoRelatorio.antes)} ${produto.unidade}`],
+      ["Saldo após o movimento", `${formatarNumero(saldoRelatorio.depois)} ${produto.unidade}`],
+      ["Estoque físico atual", `${formatarNumero(calcularEstoque(produto, lancamentos))} ${produto.unidade}`],
+      ["Observação", relatorio.observacao || "—"],
+    ];
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de lançamento</title>
+<style>body{font-family:system-ui,sans-serif;padding:40px;color:#111}h1{font-size:20px;margin:0 0 4px}p.sub{color:#666;margin:0 0 24px;font-size:13px}table{width:100%;border-collapse:collapse}td{padding:10px 8px;border-bottom:1px solid #e5e5e5;font-size:14px}td:first-child{color:#666;width:220px}td:last-child{font-weight:600}</style>
+</head><body><h1>Relatório de lançamento</h1><p class="sub">Emitido em ${new Date().toLocaleString("pt-BR")}</p>
+<table>${linhas.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table>
+<script>window.onload=function(){window.print()}<\/script></body></html>`;
+    const w = window.open("", "_blank", "width=900,height=700");
+    if (!w) {
+      toast.error("Permita pop-ups para imprimir o relatório.");
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -304,6 +338,10 @@ function ProdutoDetalhe() {
                         <DropdownMenuItem onClick={() => setSaldoLancamento(l)}>
                           <Calculator className="mr-2 h-4 w-4" />
                           Calcular saldo
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setRelatorio(l)}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Gerar relatório
                         </DropdownMenuItem>
                         {!somenteLeitura && (
                           <DropdownMenuItem
@@ -464,6 +502,99 @@ function ProdutoDetalhe() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!relatorio} onOpenChange={(v) => !v && setRelatorio(null)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Relatório do lançamento</DialogTitle>
+            <DialogDescription>
+              Resumo completo do movimento e do impacto no estoque.
+            </DialogDescription>
+          </DialogHeader>
+          {relatorio && saldoRelatorio && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/40 p-4">
+                <div>
+                  <div className="text-xs text-muted-foreground">Material</div>
+                  <div className="text-lg font-semibold">{produto.nome}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatarData(relatorio.data)} às {relatorio.hora}
+                  </div>
+                </div>
+                <TipoBadge tipo={relatorio.tipo} />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Card
+                  label="Saldo anterior"
+                  value={`${formatarNumero(saldoRelatorio.antes)} ${produto.unidade}`}
+                />
+                <Card
+                  label={
+                    relatorio.tipo === "entrada"
+                      ? "Entrada"
+                      : relatorio.tipo === "saida"
+                        ? "Saída"
+                        : "Balanço"
+                  }
+                  value={`${formatarNumero(relatorio.quantidade)} ${relatorio.unidade}`}
+                  destaque
+                />
+                <Card
+                  label="Saldo após o movimento"
+                  value={`${formatarNumero(saldoRelatorio.depois)} ${produto.unidade}`}
+                />
+              </div>
+
+              <div className="grid gap-3 rounded-lg border p-4 sm:grid-cols-3">
+                <Info label="Localização" value={produto.localizacao || "—"} />
+                <Info label="Estoque inicial" value={formatarNumero(produto.estoqueInicial)} />
+                <Info
+                  label="Estoque físico atual"
+                  value={`${formatarNumero(calcularEstoque(produto, lancamentos))} ${produto.unidade}`}
+                />
+                <div className="sm:col-span-3">
+                  <div className="text-xs text-muted-foreground">Observação</div>
+                  <div className="whitespace-pre-wrap text-sm">
+                    {relatorio.observacao || "—"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button variant="outline" onClick={() => setRelatorio(null)}>
+                  Fechar
+                </Button>
+                <Button onClick={imprimirRelatorio}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimir / PDF
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Card({
+  label,
+  value,
+  destaque,
+}: {
+  label: string;
+  value: string;
+  destaque?: boolean;
+}) {
+  return (
+    <div
+      className={
+        "rounded-lg border p-4 " + (destaque ? "border-primary/40 bg-primary/5" : "bg-card")
+      }
+    >
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-lg font-semibold">{value}</div>
     </div>
   );
 }
