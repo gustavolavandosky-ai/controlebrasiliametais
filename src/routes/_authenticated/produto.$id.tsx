@@ -70,6 +70,7 @@ function ProdutoDetalhe() {
   const [confirm, setConfirm] = useState<Lancamento | null>(null);
   const [excluindo, setExcluindo] = useState(false);
   const [saldoLancamento, setSaldoLancamento] = useState<Lancamento | null>(null);
+  const [relatorio, setRelatorio] = useState<Lancamento | null>(null);
   const [busca, setBusca] = useState("");
   const [dataDe, setDataDe] = useState("");
   const [dataAte, setDataAte] = useState("");
