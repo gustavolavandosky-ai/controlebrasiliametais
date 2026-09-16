@@ -36,7 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator, Search, X } from "lucide-react";
+import { ArrowLeft, MoreVertical, Pencil, Plus, Trash2, Calculator, Search, X, FileText, Printer } from "lucide-react";
 import {
   useInventory,
   calcularEstoque,
