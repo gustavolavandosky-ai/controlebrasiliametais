@@ -41,14 +41,19 @@ function CadastrosPage() {
     colaboradores,
     tipos,
     destinos,
+    equipesCadastradas,
+    coresEquipe,
     salvarColaborador,
     salvarTipo,
     salvarDestino,
+    salvarEquipe,
     excluirCadastro,
   } = useDiarias();
 
   const [nomeColab, setNomeColab] = useState("");
   const [equipeColab, setEquipeColab] = useState("");
+  const [nomeEquipe, setNomeEquipe] = useState("");
+  const [corEquipe, setCorEquipe] = useState("#3fbf7f");
   const [nomeTipo, setNomeTipo] = useState("");
   const [valorTipo, setValorTipo] = useState("");
   const [nomeDestino, setNomeDestino] = useState("");
