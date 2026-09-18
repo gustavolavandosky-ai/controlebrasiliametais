@@ -95,13 +95,27 @@ function CadastrosPage() {
               onChange={(e) => setEquipeColab(e.target.value)}
               aria-label="Equipe do colaborador"
             />
+            <div className="flex items-center gap-2">
+              <Label htmlFor="cor-equipe-colab" className="text-sm text-muted-foreground">
+                Cor da equipe
+              </Label>
+              <Input
+                id="cor-equipe-colab"
+                type="color"
+                className="h-9 w-14 p-1"
+                value={coresEquipe[equipeColab.trim().toUpperCase()] ?? corEquipe}
+                onChange={(e) => setCorEquipe(e.target.value)}
+              />
+            </div>
             <Button
               onClick={() =>
                 void run(async () => {
                   if (!nomeColab.trim()) throw new Error("Informe o nome");
+                  const equipe = equipeColab.trim().toUpperCase() || null;
+                  if (equipe) await salvarEquipe({ nome: equipe, cor: corEquipe });
                   await salvarColaborador({
                     nome: nomeColab.trim().toUpperCase(),
-                    equipe: equipeColab.trim().toUpperCase() || null,
+                    equipe,
                   });
                   setNomeColab("");
                   setEquipeColab("");
