@@ -173,6 +173,90 @@ function CadastrosPage() {
         </section>
 
         <section className="mb-8 rounded-lg border bg-card">
+          <h2 className="border-b px-4 py-3 text-sm font-semibold">Equipes e cores</h2>
+          <div className="flex flex-wrap items-center gap-3 border-b p-4">
+            <Input
+              className="w-56"
+              placeholder="Nome da equipe"
+              value={nomeEquipe}
+              onChange={(e) => setNomeEquipe(e.target.value)}
+              aria-label="Nome da equipe"
+            />
+            <Input
+              type="color"
+              className="h-9 w-14 p-1"
+              value={corEquipe}
+              onChange={(e) => setCorEquipe(e.target.value)}
+              aria-label="Cor da equipe"
+            />
+            <Button
+              onClick={() =>
+                void run(async () => {
+                  if (!nomeEquipe.trim()) throw new Error("Informe o nome da equipe");
+                  await salvarEquipe({
+                    nome: nomeEquipe.trim().toUpperCase(),
+                    cor: corEquipe,
+                  });
+                  setNomeEquipe("");
+                }, "Equipe salva")
+              }
+            >
+              Adicionar
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Equipe</TableHead>
+                <TableHead className="w-32">Cor</TableHead>
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {equipesCadastradas.map((e) => (
+                <TableRow key={e.id}>
+                  <TableCell className="font-medium">
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        className="h-3 w-3 rounded-full border"
+                        style={{ backgroundColor: e.cor }}
+                      />
+                      {e.nome}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="color"
+                      className="h-8 w-14 p-1"
+                      value={e.cor}
+                      aria-label={`Cor da equipe ${e.nome}`}
+                      onChange={(ev) =>
+                        void run(
+                          () => salvarEquipe({ nome: e.nome, cor: ev.target.value }, e.id),
+                          "Cor atualizada",
+                        )
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Excluir ${e.nome}`}
+                      onClick={() =>
+                        void run(() => excluirCadastro("equipes", e.id), "Equipe excluída")
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
+
+        <section className="mb-8 rounded-lg border bg-card">
           <h2 className="border-b px-4 py-3 text-sm font-semibold">Tipos de diária</h2>
           <div className="flex flex-wrap gap-3 border-b p-4">
             <Input
