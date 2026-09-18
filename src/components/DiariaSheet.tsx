@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  EQUIPES,
   formatarMoeda,
   useDiarias,
   type Diaria,
