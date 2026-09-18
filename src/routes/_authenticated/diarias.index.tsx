@@ -34,7 +34,6 @@ import {
   Download,
 } from "lucide-react";
 import {
-  CORES_EQUIPE,
   agruparDiarias,
   formatarData,
   formatarMoeda,
