@@ -306,8 +306,16 @@ export function useDiarias() {
     [invalidate],
   );
 
+  const equipes = useMemo(() => {
+    const set = new Set<string>(EQUIPES);
+    for (const c of colaboradoresQuery.data ?? []) if (c.equipe) set.add(c.equipe);
+    for (const d of diariasQuery.data ?? []) if (d.equipe) set.add(d.equipe);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [colaboradoresQuery.data, diariasQuery.data]);
+
   return {
     diarias: useMemo(() => diariasQuery.data ?? [], [diariasQuery.data]),
+    equipes,
     colaboradores: useMemo(
       () => colaboradoresQuery.data ?? [],
       [colaboradoresQuery.data],

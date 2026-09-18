@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  EQUIPES,
   formatarMoeda,
   useDiarias,
   type Diaria,
@@ -36,7 +35,7 @@ interface Props {
 const SEM_EQUIPE = "__sem";
 
 export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
-  const { colaboradores, tipos, destinos, salvarGrupo } = useDiarias();
+  const { colaboradores, tipos, destinos, equipes, salvarGrupo } = useDiarias();
   const base = grupo?.[0] ?? null;
 
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
@@ -174,7 +173,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={SEM_EQUIPE}>Sem equipe</SelectItem>
-                {EQUIPES.map((e) => (
+                {equipes.map((e) => (
                   <SelectItem key={e} value={e}>
                     {e}
                   </SelectItem>

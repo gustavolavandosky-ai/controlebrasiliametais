@@ -35,7 +35,6 @@ import {
 } from "lucide-react";
 import {
   CORES_EQUIPE,
-  EQUIPES,
   agruparDiarias,
   formatarData,
   formatarMoeda,
@@ -82,7 +81,8 @@ function Cartao({ titulo, valor, sub }: { titulo: string; valor: string; sub?: s
 }
 
 function DiariasPage() {
-  const { diarias, colaboradores, destinos, deleteDiarias, carregando } = useDiarias();
+  const { diarias, colaboradores, destinos, equipes, deleteDiarias, carregando } =
+    useDiarias();
   const { somenteLeitura } = useAccess();
 
   const [busca, setBusca] = useState("");
@@ -262,7 +262,7 @@ function DiariasPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={TODOS}>Todas as equipes</SelectItem>
-              {EQUIPES.map((e) => (
+              {equipes.map((e) => (
                 <SelectItem key={e} value={e}>
                   {e}
                 </SelectItem>
