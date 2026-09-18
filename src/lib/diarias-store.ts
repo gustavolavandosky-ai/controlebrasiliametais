@@ -48,6 +48,14 @@ export interface GrupoDiaria {
 
 export const EQUIPES = ["LEO", "ADELSON", "ALMI", "GIL"] as const;
 
+export interface Equipe {
+  id: string;
+  nome: string;
+  cor: string;
+}
+
+export const COR_EQUIPE_PADRAO = "#9ca3af";
+
 export const CORES_EQUIPE: Record<string, string> = {
   LEO: "var(--equipe-leo)",
   ADELSON: "var(--equipe-adelson)",
