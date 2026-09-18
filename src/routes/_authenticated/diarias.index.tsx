@@ -34,7 +34,6 @@ import {
   Download,
 } from "lucide-react";
 import {
-  CORES_EQUIPE,
   agruparDiarias,
   formatarData,
   formatarMoeda,
@@ -81,8 +80,15 @@ function Cartao({ titulo, valor, sub }: { titulo: string; valor: string; sub?: s
 }
 
 function DiariasPage() {
-  const { diarias, colaboradores, destinos, equipes, deleteDiarias, carregando } =
-    useDiarias();
+  const {
+    diarias,
+    colaboradores,
+    destinos,
+    equipes,
+    coresEquipe,
+    deleteDiarias,
+    carregando,
+  } = useDiarias();
   const { somenteLeitura } = useAccess();
 
   const [busca, setBusca] = useState("");
@@ -378,7 +384,7 @@ function DiariasPage() {
                     <div
                       className="h-10 w-1.5 rounded-r"
                       style={{
-                        backgroundColor: CORES_EQUIPE[d.equipe] ?? "transparent",
+                        backgroundColor: coresEquipe[d.equipe] ?? "transparent",
                       }}
                     />
                   </TableCell>

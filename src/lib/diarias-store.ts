@@ -48,6 +48,14 @@ export interface GrupoDiaria {
 
 export const EQUIPES = ["LEO", "ADELSON", "ALMI", "GIL"] as const;
 
+export interface Equipe {
+  id: string;
+  nome: string;
+  cor: string;
+}
+
+export const COR_EQUIPE_PADRAO = "#9ca3af";
+
 export const CORES_EQUIPE: Record<string, string> = {
   LEO: "var(--equipe-leo)",
   ADELSON: "var(--equipe-adelson)",
@@ -148,6 +156,19 @@ async function fetchDestinos(): Promise<Destino[]> {
   return (data ?? []).map((r) => ({ id: r.id, nome: r.nome }));
 }
 
+async function fetchEquipes(): Promise<Equipe[]> {
+  const { data, error } = await supabase
+    .from("equipes")
+    .select("*")
+    .order("nome", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    nome: r.nome,
+    cor: r.cor ?? COR_EQUIPE_PADRAO,
+  }));
+}
+
 export function useDiarias() {
   const qc = useQueryClient();
 
@@ -158,6 +179,7 @@ export function useDiarias() {
   });
   const tiposQuery = useQuery({ queryKey: ["tipos_diaria"], queryFn: fetchTipos });
   const destinosQuery = useQuery({ queryKey: ["destinos"], queryFn: fetchDestinos });
+  const equipesQuery = useQuery({ queryKey: ["equipes"], queryFn: fetchEquipes });
 
   const invalidate = useCallback(async () => {
     await Promise.all([
@@ -165,6 +187,7 @@ export function useDiarias() {
       qc.invalidateQueries({ queryKey: ["colaboradores"] }),
       qc.invalidateQueries({ queryKey: ["tipos_diaria"] }),
       qc.invalidateQueries({ queryKey: ["destinos"] }),
+      qc.invalidateQueries({ queryKey: ["equipes"] }),
     ]);
   }, [qc]);
 
@@ -297,8 +320,28 @@ export function useDiarias() {
     [invalidate],
   );
 
+  const salvarEquipe = useCallback(
+    async (valores: { nome: string; cor: string }, id?: string) => {
+      if (id) {
+        const { error } = await supabase.from("equipes").update(valores).eq("id", id);
+        if (error) throw error;
+      } else {
+        const user_id = await requireUserId();
+        const { error } = await supabase
+          .from("equipes")
+          .upsert({ ...valores, user_id }, { onConflict: "user_id,nome" });
+        if (error) throw error;
+      }
+      await invalidate();
+    },
+    [invalidate],
+  );
+
   const excluirCadastro = useCallback(
-    async (tabela: "colaboradores" | "tipos_diaria" | "destinos", id: string) => {
+    async (
+      tabela: "colaboradores" | "tipos_diaria" | "destinos" | "equipes",
+      id: string,
+    ) => {
       const { error } = await supabase.from(tabela).delete().eq("id", id);
       if (error) throw error;
       await invalidate();
@@ -306,16 +349,31 @@ export function useDiarias() {
     [invalidate],
   );
 
+  const equipesCadastradas = useMemo(
+    () => equipesQuery.data ?? [],
+    [equipesQuery.data],
+  );
+
   const equipes = useMemo(() => {
     const set = new Set<string>(EQUIPES);
+    for (const e of equipesCadastradas) set.add(e.nome);
     for (const c of colaboradoresQuery.data ?? []) if (c.equipe) set.add(c.equipe);
     for (const d of diariasQuery.data ?? []) if (d.equipe) set.add(d.equipe);
     return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [colaboradoresQuery.data, diariasQuery.data]);
+  }, [equipesCadastradas, colaboradoresQuery.data, diariasQuery.data]);
+
+  const coresEquipe = useMemo(() => {
+    const mapa: Record<string, string> = { ...CORES_EQUIPE };
+    for (const e of equipesCadastradas) mapa[e.nome] = e.cor;
+    return mapa;
+  }, [equipesCadastradas]);
 
   return {
     diarias: useMemo(() => diariasQuery.data ?? [], [diariasQuery.data]),
     equipes,
+    equipesCadastradas,
+    coresEquipe,
+    salvarEquipe,
     colaboradores: useMemo(
       () => colaboradoresQuery.data ?? [],
       [colaboradoresQuery.data],
