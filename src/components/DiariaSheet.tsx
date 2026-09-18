@@ -173,7 +173,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={SEM_EQUIPE}>Sem equipe</SelectItem>
-                {EQUIPES.map((e) => (
+                {equipes.map((e) => (
                   <SelectItem key={e} value={e}>
                     {e}
                   </SelectItem>
