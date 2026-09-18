@@ -262,7 +262,7 @@ function DiariasPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={TODOS}>Todas as equipes</SelectItem>
-              {EQUIPES.map((e) => (
+              {equipes.map((e) => (
                 <SelectItem key={e} value={e}>
                   {e}
                 </SelectItem>
