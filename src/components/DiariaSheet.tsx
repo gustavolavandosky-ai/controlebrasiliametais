@@ -35,7 +35,7 @@ interface Props {
 const SEM_EQUIPE = "__sem";
 
 export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
-  const { colaboradores, tipos, destinos, salvarGrupo } = useDiarias();
+  const { colaboradores, tipos, destinos, equipes, salvarGrupo } = useDiarias();
   const base = grupo?.[0] ?? null;
 
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
