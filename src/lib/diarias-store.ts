@@ -156,6 +156,19 @@ async function fetchDestinos(): Promise<Destino[]> {
   return (data ?? []).map((r) => ({ id: r.id, nome: r.nome }));
 }
 
+async function fetchEquipes(): Promise<Equipe[]> {
+  const { data, error } = await supabase
+    .from("equipes")
+    .select("*")
+    .order("nome", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    nome: r.nome,
+    cor: r.cor ?? COR_EQUIPE_PADRAO,
+  }));
+}
+
 export function useDiarias() {
   const qc = useQueryClient();
 
@@ -166,6 +179,7 @@ export function useDiarias() {
   });
   const tiposQuery = useQuery({ queryKey: ["tipos_diaria"], queryFn: fetchTipos });
   const destinosQuery = useQuery({ queryKey: ["destinos"], queryFn: fetchDestinos });
+  const equipesQuery = useQuery({ queryKey: ["equipes"], queryFn: fetchEquipes });
 
   const invalidate = useCallback(async () => {
     await Promise.all([
@@ -173,6 +187,7 @@ export function useDiarias() {
       qc.invalidateQueries({ queryKey: ["colaboradores"] }),
       qc.invalidateQueries({ queryKey: ["tipos_diaria"] }),
       qc.invalidateQueries({ queryKey: ["destinos"] }),
+      qc.invalidateQueries({ queryKey: ["equipes"] }),
     ]);
   }, [qc]);
 
