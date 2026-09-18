@@ -138,7 +138,19 @@ function CadastrosPage() {
               {colaboradores.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="font-medium">{c.nome}</TableCell>
-                  <TableCell className="text-muted-foreground">{c.equipe || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {c.equipe ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="h-3 w-3 rounded-full border"
+                          style={{ backgroundColor: coresEquipe[c.equipe] ?? "transparent" }}
+                        />
+                        {c.equipe}
+                      </span>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"
