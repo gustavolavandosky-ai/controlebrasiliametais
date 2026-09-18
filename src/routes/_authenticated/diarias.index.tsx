@@ -378,7 +378,7 @@ function DiariasPage() {
                     <div
                       className="h-10 w-1.5 rounded-r"
                       style={{
-                        backgroundColor: CORES_EQUIPE[d.equipe] ?? "transparent",
+                        backgroundColor: coresEquipe[d.equipe] ?? "transparent",
                       }}
                     />
                   </TableCell>
