@@ -320,8 +320,28 @@ export function useDiarias() {
     [invalidate],
   );
 
+  const salvarEquipe = useCallback(
+    async (valores: { nome: string; cor: string }, id?: string) => {
+      if (id) {
+        const { error } = await supabase.from("equipes").update(valores).eq("id", id);
+        if (error) throw error;
+      } else {
+        const user_id = await requireUserId();
+        const { error } = await supabase
+          .from("equipes")
+          .upsert({ ...valores, user_id }, { onConflict: "user_id,nome" });
+        if (error) throw error;
+      }
+      await invalidate();
+    },
+    [invalidate],
+  );
+
   const excluirCadastro = useCallback(
-    async (tabela: "colaboradores" | "tipos_diaria" | "destinos", id: string) => {
+    async (
+      tabela: "colaboradores" | "tipos_diaria" | "destinos" | "equipes",
+      id: string,
+    ) => {
       const { error } = await supabase.from(tabela).delete().eq("id", id);
       if (error) throw error;
       await invalidate();
@@ -329,16 +349,31 @@ export function useDiarias() {
     [invalidate],
   );
 
+  const equipesCadastradas = useMemo(
+    () => equipesQuery.data ?? [],
+    [equipesQuery.data],
+  );
+
   const equipes = useMemo(() => {
     const set = new Set<string>(EQUIPES);
+    for (const e of equipesCadastradas) set.add(e.nome);
     for (const c of colaboradoresQuery.data ?? []) if (c.equipe) set.add(c.equipe);
     for (const d of diariasQuery.data ?? []) if (d.equipe) set.add(d.equipe);
     return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [colaboradoresQuery.data, diariasQuery.data]);
+  }, [equipesCadastradas, colaboradoresQuery.data, diariasQuery.data]);
+
+  const coresEquipe = useMemo(() => {
+    const mapa: Record<string, string> = { ...CORES_EQUIPE };
+    for (const e of equipesCadastradas) mapa[e.nome] = e.cor;
+    return mapa;
+  }, [equipesCadastradas]);
 
   return {
     diarias: useMemo(() => diariasQuery.data ?? [], [diariasQuery.data]),
     equipes,
+    equipesCadastradas,
+    coresEquipe,
+    salvarEquipe,
     colaboradores: useMemo(
       () => colaboradoresQuery.data ?? [],
       [colaboradoresQuery.data],
