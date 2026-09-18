@@ -81,8 +81,15 @@ function Cartao({ titulo, valor, sub }: { titulo: string; valor: string; sub?: s
 }
 
 function DiariasPage() {
-  const { diarias, colaboradores, destinos, equipes, deleteDiarias, carregando } =
-    useDiarias();
+  const {
+    diarias,
+    colaboradores,
+    destinos,
+    equipes,
+    coresEquipe,
+    deleteDiarias,
+    carregando,
+  } = useDiarias();
   const { somenteLeitura } = useAccess();
 
   const [busca, setBusca] = useState("");
