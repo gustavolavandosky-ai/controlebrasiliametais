@@ -185,6 +185,98 @@ export type Database = {
         }
         Relationships: []
       }
+      epi_lancamentos: {
+        Row: {
+          created_at: string
+          data: string
+          equipamento_id: string
+          hora: string
+          id: string
+          motivo: string
+          observacao: string
+          quantidade: number
+          retirado_por: string
+          tipo: string
+          unidade: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          equipamento_id: string
+          hora?: string
+          id?: string
+          motivo?: string
+          observacao?: string
+          quantidade?: number
+          retirado_por?: string
+          tipo: string
+          unidade?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          equipamento_id?: string
+          hora?: string
+          id?: string
+          motivo?: string
+          observacao?: string
+          quantidade?: number
+          retirado_por?: string
+          tipo?: string
+          unidade?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epi_lancamentos_equipamento_id_fkey"
+            columns: ["equipamento_id"]
+            isOneToOne: false
+            referencedRelation: "equipamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipamentos: {
+        Row: {
+          created_at: string
+          estoque_inicial: number
+          id: string
+          localizacao: string
+          nome: string
+          observacoes: string
+          unidade: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          estoque_inicial?: number
+          id?: string
+          localizacao?: string
+          nome: string
+          observacoes?: string
+          unidade?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          estoque_inicial?: number
+          id?: string
+          localizacao?: string
+          nome?: string
+          observacoes?: string
+          unidade?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       equipes: {
         Row: {
           cor: string
