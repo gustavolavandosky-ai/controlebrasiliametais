@@ -18,6 +18,8 @@ import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedDiariasIndexRouteImport } from './routes/_authenticated/diarias.index'
 import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_authenticated/diarias.cadastros'
+import { Route as AuthenticatedEpiIndexRouteImport } from './routes/_authenticated/epi.index'
+import { Route as AuthenticatedEpiEquipamentosRouteImport } from './routes/_authenticated/epi.equipamentos'
 import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -66,6 +68,17 @@ const AuthenticatedDiariasCadastrosRoute =
     path: '/diarias/cadastros',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEpiIndexRoute = AuthenticatedEpiIndexRouteImport.update({
+  id: '/epi/',
+  path: '/epi/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEpiEquipamentosRoute =
+  AuthenticatedEpiEquipamentosRouteImport.update({
+    id: '/epi/equipamentos',
+    path: '/epi/equipamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -80,8 +93,10 @@ export interface FileRoutesByFullPath {
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias/': typeof AuthenticatedDiariasIndexRoute
+  '/epi/': typeof AuthenticatedEpiIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,8 +106,10 @@ export interface FileRoutesByTo {
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias': typeof AuthenticatedDiariasIndexRoute
+  '/epi': typeof AuthenticatedEpiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,8 +121,10 @@ export interface FileRoutesById {
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/_authenticated/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/_authenticated/diarias/': typeof AuthenticatedDiariasIndexRoute
+  '/_authenticated/epi/': typeof AuthenticatedEpiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,8 +136,10 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/produtos'
     | '/diarias/cadastros'
+    | '/epi/equipamentos'
     | '/produto/$id'
     | '/diarias/'
+    | '/epi/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,8 +149,10 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/produtos'
     | '/diarias/cadastros'
+    | '/epi/equipamentos'
     | '/produto/$id'
     | '/diarias'
+    | '/epi'
   id:
     | '__root__'
     | '/'
@@ -140,8 +163,10 @@ export interface FileRouteTypes {
     | '/_authenticated/estoque'
     | '/_authenticated/produtos'
     | '/_authenticated/diarias/cadastros'
+    | '/_authenticated/epi/equipamentos'
     | '/_authenticated/produto/$id'
     | '/_authenticated/diarias/'
+    | '/_authenticated/epi/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -215,6 +240,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiariasCadastrosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/epi/': {
+      id: '/_authenticated/epi/'
+      path: '/epi'
+      fullPath: '/epi/'
+      preLoaderRoute: typeof AuthenticatedEpiIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/epi/equipamentos': {
+      id: '/_authenticated/epi/equipamentos'
+      path: '/epi/equipamentos'
+      fullPath: '/epi/equipamentos'
+      preLoaderRoute: typeof AuthenticatedEpiEquipamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produto/$id': {
       id: '/_authenticated/produto/$id'
       path: '/produto/$id'
@@ -231,8 +270,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedDiariasCadastrosRoute: typeof AuthenticatedDiariasCadastrosRoute
+  AuthenticatedEpiEquipamentosRoute: typeof AuthenticatedEpiEquipamentosRoute
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
   AuthenticatedDiariasIndexRoute: typeof AuthenticatedDiariasIndexRoute
+  AuthenticatedEpiIndexRoute: typeof AuthenticatedEpiIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -241,8 +282,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedDiariasCadastrosRoute: AuthenticatedDiariasCadastrosRoute,
+  AuthenticatedEpiEquipamentosRoute: AuthenticatedEpiEquipamentosRoute,
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
   AuthenticatedDiariasIndexRoute: AuthenticatedDiariasIndexRoute,
+  AuthenticatedEpiIndexRoute: AuthenticatedEpiIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
