@@ -21,6 +21,7 @@ import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_aut
 import { Route as AuthenticatedEpiIndexRouteImport } from './routes/_authenticated/epi.index'
 import { Route as AuthenticatedEpiEquipamentosRouteImport } from './routes/_authenticated/epi.equipamentos'
 import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
+import { Route as AuthenticatedEpiItemIdRouteImport } from './routes/_authenticated/epi.item.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -84,6 +85,11 @@ const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
   path: '/produto/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEpiItemIdRoute = AuthenticatedEpiItemIdRouteImport.update({
+  id: '/epi/item/$id',
+  path: '/epi/item/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/epi/': typeof AuthenticatedEpiIndexRoute
+  '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias': typeof AuthenticatedDiariasIndexRoute
   '/epi': typeof AuthenticatedEpiIndexRoute
+  '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/_authenticated/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/_authenticated/epi/': typeof AuthenticatedEpiIndexRoute
+  '/_authenticated/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/produto/$id'
     | '/diarias/'
     | '/epi/'
+    | '/epi/item/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/produto/$id'
     | '/diarias'
     | '/epi'
+    | '/epi/item/$id'
   id:
     | '__root__'
     | '/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/_authenticated/produto/$id'
     | '/_authenticated/diarias/'
     | '/_authenticated/epi/'
+    | '/_authenticated/epi/item/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProdutoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/epi/item/$id': {
+      id: '/_authenticated/epi/item/$id'
+      path: '/epi/item/$id'
+      fullPath: '/epi/item/$id'
+      preLoaderRoute: typeof AuthenticatedEpiItemIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -274,6 +293,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
   AuthenticatedDiariasIndexRoute: typeof AuthenticatedDiariasIndexRoute
   AuthenticatedEpiIndexRoute: typeof AuthenticatedEpiIndexRoute
+  AuthenticatedEpiItemIdRoute: typeof AuthenticatedEpiItemIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -286,6 +306,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
   AuthenticatedDiariasIndexRoute: AuthenticatedDiariasIndexRoute,
   AuthenticatedEpiIndexRoute: AuthenticatedEpiIndexRoute,
+  AuthenticatedEpiItemIdRoute: AuthenticatedEpiItemIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
