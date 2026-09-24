@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccess } from "@/hooks/use-access";
-import { LogOut, Users, Boxes, CalendarDays, Undo2 } from "lucide-react";
+import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat } from "lucide-react";
 
 export function AppHeader({ title }: { title: string }) {
   const { user } = useAuth();
@@ -54,6 +54,12 @@ export function AppHeader({ title }: { title: string }) {
               <Link to="/devolucoes">
                 <Undo2 className="mr-2 h-4 w-4" />
                 Devoluções
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/epi">
+                <HardHat className="mr-2 h-4 w-4" />
+                EPI
               </Link>
             </Button>
           </nav>
