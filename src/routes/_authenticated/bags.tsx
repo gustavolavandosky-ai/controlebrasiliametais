@@ -134,10 +134,10 @@ function BagsPage() {
 
   const salvar = async () => {
     if (!form || travado.current) return;
-    if (form.quantidade <= 0 && form.tipo !== "balanco") return toast.error("Informe a quantidade.");
+    if (form.quantidade <= 0 && form.tipo !== "balanco") { toast.error("Informe a quantidade."); return; }
     if (form.tipo === "saida" && form.quantidadeRetornada > form.quantidade)
-      return toast.error("Não pode voltar mais do que saiu.");
-    if (form.tipo === "saida" && !form.cliente.trim()) return toast.error("Informe o cliente.");
+      { toast.error("Não pode voltar mais do que saiu."); return; }
+    if (form.tipo === "saida" && !form.cliente.trim()) { toast.error("Informe o cliente."); return; }
     travado.current = true; setSalvando(true);
     try {
       if (editId) await update(editId, form); else await add(form);
