@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      bag_movimentos: {
+        Row: {
+          cliente: string
+          created_at: string
+          data: string
+          fornecedor: string
+          id: string
+          observacao: string
+          quantidade: number
+          quantidade_retornada: number
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cliente?: string
+          created_at?: string
+          data?: string
+          fornecedor?: string
+          id?: string
+          observacao?: string
+          quantidade?: number
+          quantidade_retornada?: number
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          data?: string
+          fornecedor?: string
+          id?: string
+          observacao?: string
+          quantidade?: number
+          quantidade_retornada?: number
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           created_at: string
