@@ -65,6 +65,10 @@
   --color-equipe-gil: var(--equipe-gil);
   --color-positivo: var(--positivo);
   --color-negativo: var(--negativo);
+  --color-bag-entrada: var(--bag-entrada);
+  --color-bag-saida: var(--bag-saida);
+  --color-bag-retorno: var(--bag-retorno);
+  --color-bag-balanco: var(--bag-balanco);
 }
 
 :root {
@@ -107,6 +111,10 @@
   --equipe-gil: oklch(0.85 0.16 95);
   --positivo: oklch(0.55 0.16 150);
   --negativo: oklch(0.55 0.22 27);
+  --bag-entrada: oklch(0.58 0.16 150);
+  --bag-saida: oklch(0.62 0.19 45);
+  --bag-retorno: oklch(0.58 0.16 245);
+  --bag-balanco: oklch(0.55 0.2 300);
 }
 
 .dark {
@@ -148,6 +156,10 @@
   --equipe-gil: oklch(0.78 0.15 95);
   --positivo: oklch(0.75 0.17 150);
   --negativo: oklch(0.7 0.19 22);
+  --bag-entrada: oklch(0.75 0.17 150);
+  --bag-saida: oklch(0.75 0.17 50);
+  --bag-retorno: oklch(0.72 0.15 245);
+  --bag-balanco: oklch(0.72 0.17 300);
 }
 
 @layer base {
