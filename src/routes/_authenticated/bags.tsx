@@ -28,6 +28,7 @@ import {
   ShoppingBag,
   Trash2,
   Undo2,
+  AlertTriangle,
 } from "lucide-react";
 import { useAccess } from "@/hooks/use-access";
 import {
@@ -61,6 +62,12 @@ const CORES: Record<TipoBag, string> = {
   balanco: "var(--bag-balanco)",
 };
 const NOMES: Record<TipoBag, string> = { entrada: "Entrada", saida: "Saída", balanco: "Balanço" };
+function situacaoSaida(m: { tipo: TipoBag; quantidade: number; quantidadeRetornada: number }) {
+  if (m.tipo !== "saida") return null;
+  if (m.quantidadeRetornada > m.quantidade) return { cor: "var(--negativo)", texto: "Voltou mais do que saiu" };
+  if (m.quantidadeRetornada < m.quantidade) return { cor: "var(--bag-pendente)", texto: "Voltou menos do que saiu" };
+  return null;
+}
 const fmt = (n: number) => n.toLocaleString("pt-BR");
 const fmtData = (d: string) => d.split("-").reverse().join("/");
 const hoje = () => new Date().toLocaleDateString("en-CA");
@@ -135,8 +142,6 @@ function BagsPage() {
   const salvar = async () => {
     if (!form || travado.current) return;
     if (form.quantidade <= 0 && form.tipo !== "balanco") { toast.error("Informe a quantidade."); return; }
-    if (form.tipo === "saida" && form.quantidadeRetornada > form.quantidade)
-      { toast.error("Não pode voltar mais do que saiu."); return; }
     if (form.tipo === "saida" && !form.cliente.trim()) { toast.error("Informe o cliente."); return; }
     travado.current = true; setSalvando(true);
     try {
@@ -236,11 +241,26 @@ function BagsPage() {
               )}
               {visiveis.map((m) => {
                 const s = saldos.get(m.id);
+                const sit = situacaoSaida(m);
                 return (
                   <TableRow key={m.id} onClick={() => editar(m)} className={somenteLeitura ? "" : "cursor-pointer"}
-                    style={{ boxShadow: `inset 4px 0 0 ${CORES[m.tipo]}` }}>
+                    title={sit?.texto}
+                    style={{
+                      boxShadow: `inset 4px 0 0 ${sit?.cor ?? CORES[m.tipo]}`,
+                      backgroundColor: sit ? `color-mix(in oklab, ${sit.cor} 14%, transparent)` : undefined,
+                    }}>
                     <TableCell className="whitespace-nowrap">{fmtData(m.data)}</TableCell>
-                    <TableCell><Selo tipo={m.tipo} /></TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        <Selo tipo={m.tipo} />
+                        {sit && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: sit.cor }}>
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            {sit.texto === "Voltou mais do que saiu" ? "Alerta" : "Faltou voltar"}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{m.tipo === "entrada" ? m.fornecedor : m.tipo === "saida" ? m.cliente : "—"}</TableCell>
                     <TableCell className="text-right font-semibold" style={{ color: CORES[m.tipo] }}>
                       {m.tipo === "entrada" ? "+" : m.tipo === "saida" ? "−" : "="}{fmt(m.quantidade)}
@@ -312,12 +332,19 @@ function BagsPage() {
                     </div>
                   </div>
                 )}
-                {form.tipo === "saida" && (
+                {form.tipo === "saida" && (form.quantidadeRetornada > form.quantidade ? (
+                  <p className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: "var(--negativo)" }}>
+                    <AlertTriangle className="h-4 w-4" />
+                    Alerta: voltaram {fmt(form.quantidadeRetornada - form.quantidade)} a mais do que saíram
+                  </p>
+                ) : (
                   <p className="text-sm text-muted-foreground">
                     Ficaram com o cliente:{" "}
-                    <strong style={{ color: "var(--bag-saida)" }}>{fmt(Math.max(0, form.quantidade - form.quantidadeRetornada))}</strong>
+                    <strong style={{ color: form.quantidadeRetornada < form.quantidade ? "var(--bag-pendente)" : "var(--bag-saida)" }}>
+                      {fmt(form.quantidade - form.quantidadeRetornada)}
+                    </strong>
                   </p>
-                )}
+                ))}
                 <div className="grid gap-1.5">
                   <Label>Observações</Label>
                   <Textarea value={form.observacao} maxLength={1000} onChange={(e) => set("observacao", e.target.value)} />
