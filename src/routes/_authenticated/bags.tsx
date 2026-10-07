@@ -112,12 +112,15 @@ function BagsPage() {
 
   const { estoque, saldos } = useMemo(() => calcularSaldosBags(movimentos), [movimentos]);
   const totais = useMemo(() => {
-    let ent = 0, sai = 0, ret = 0;
+    let ent = 0, sai = 0, ret = 0, fora = 0;
     for (const m of movimentos) {
       if (m.tipo === "entrada") ent += m.quantidade;
-      if (m.tipo === "saida") { sai += m.quantidade; ret += m.quantidadeRetornada; }
+      if (m.tipo === "saida") {
+        sai += m.quantidade; ret += m.quantidadeRetornada;
+        fora += Math.max(0, m.quantidade - m.quantidadeRetornada);
+      }
     }
-    return { ent, sai, ret, fora: sai - ret };
+    return { ent, sai, ret, fora };
   }, [movimentos]);
 
   const lista = useMemo(() => {
