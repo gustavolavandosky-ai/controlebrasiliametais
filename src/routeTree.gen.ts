@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAbastecimentoRouteImport } from './routes/_authenticated/abastecimento'
 import { Route as AuthenticatedAcessosRouteImport } from './routes/_authenticated/acessos'
 import { Route as AuthenticatedBagsRouteImport } from './routes/_authenticated/bags'
 import { Route as AuthenticatedDevolucoesRouteImport } from './routes/_authenticated/devolucoes'
@@ -38,6 +39,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAbastecimentoRoute =
+  AuthenticatedAbastecimentoRouteImport.update({
+    id: '/abastecimento',
+    path: '/abastecimento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAcessosRoute = AuthenticatedAcessosRouteImport.update({
   id: '/acessos',
   path: '/acessos',
@@ -100,6 +107,7 @@ const AuthenticatedEpiItemIdRoute = AuthenticatedEpiItemIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/abastecimento': typeof AuthenticatedAbastecimentoRoute
   '/acessos': typeof AuthenticatedAcessosRoute
   '/bags': typeof AuthenticatedBagsRoute
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
@@ -115,6 +123,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/abastecimento': typeof AuthenticatedAbastecimentoRoute
   '/acessos': typeof AuthenticatedAcessosRoute
   '/bags': typeof AuthenticatedBagsRoute
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
@@ -132,6 +141,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/abastecimento': typeof AuthenticatedAbastecimentoRoute
   '/_authenticated/acessos': typeof AuthenticatedAcessosRoute
   '/_authenticated/bags': typeof AuthenticatedBagsRoute
   '/_authenticated/devolucoes': typeof AuthenticatedDevolucoesRoute
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/abastecimento'
     | '/acessos'
     | '/bags'
     | '/devolucoes'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/abastecimento'
     | '/acessos'
     | '/bags'
     | '/devolucoes'
@@ -180,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/abastecimento'
     | '/_authenticated/acessos'
     | '/_authenticated/bags'
     | '/_authenticated/devolucoes'
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/abastecimento': {
+      id: '/_authenticated/abastecimento'
+      path: '/abastecimento'
+      fullPath: '/abastecimento'
+      preLoaderRoute: typeof AuthenticatedAbastecimentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/acessos': {
       id: '/_authenticated/acessos'
@@ -303,6 +323,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAbastecimentoRoute: typeof AuthenticatedAbastecimentoRoute
   AuthenticatedAcessosRoute: typeof AuthenticatedAcessosRoute
   AuthenticatedBagsRoute: typeof AuthenticatedBagsRoute
   AuthenticatedDevolucoesRoute: typeof AuthenticatedDevolucoesRoute
@@ -317,6 +338,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAbastecimentoRoute: AuthenticatedAbastecimentoRoute,
   AuthenticatedAcessosRoute: AuthenticatedAcessosRoute,
   AuthenticatedBagsRoute: AuthenticatedBagsRoute,
   AuthenticatedDevolucoesRoute: AuthenticatedDevolucoesRoute,

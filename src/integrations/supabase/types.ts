@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      abastecimentos: {
+        Row: {
+          combustivel: string
+          created_at: string
+          data: string
+          id: string
+          km_atual: number | null
+          litros: number
+          motorista: string
+          observacao: string
+          updated_at: string
+          user_id: string
+          valor: number
+          veiculo_id: string
+        }
+        Insert: {
+          combustivel?: string
+          created_at?: string
+          data?: string
+          id?: string
+          km_atual?: number | null
+          litros?: number
+          motorista?: string
+          observacao?: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+          veiculo_id: string
+        }
+        Update: {
+          combustivel?: string
+          created_at?: string
+          data?: string
+          id?: string
+          km_atual?: number | null
+          litros?: number
+          motorista?: string
+          observacao?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abastecimentos_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bag_movimentos: {
         Row: {
           cliente: string
@@ -492,6 +545,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor_padrao?: number
+        }
+        Relationships: []
+      }
+      veiculos: {
+        Row: {
+          ano: string
+          created_at: string
+          id: string
+          modelo: string
+          observacoes: string
+          placa: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ano?: string
+          created_at?: string
+          id?: string
+          modelo?: string
+          observacoes?: string
+          placa?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ano?: string
+          created_at?: string
+          id?: string
+          modelo?: string
+          observacoes?: string
+          placa?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
