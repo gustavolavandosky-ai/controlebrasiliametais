@@ -89,7 +89,7 @@ function AbastecimentoPage() {
   const novo = () => {
     if (veiculos.length === 0) { toast.error("Cadastre um veículo primeiro."); return; }
     setEditId(null);
-    setForm({ veiculoId: sel !== "todos" ? sel : veiculos[0].id, data: hoje(), combustivel: "DIESEL", valor: 0, litros: 0, kmAtual: null, motorista: "", observacao: "" });
+    setForm({ veiculoId: sel !== "todos" ? sel : (veiculos[0]?.id ?? ""), data: hoje(), combustivel: "DIESEL", valor: 0, litros: 0, kmAtual: null, motorista: "", observacao: "" });
   };
   const run = async (fn: () => Promise<void>, ok: string, fechar: () => void) => {
     if (trava.current) return;
