@@ -8,6 +8,13 @@
       "when": 1791554277205,
       "tag": "0000_create_abastecimento",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792501553406,
+      "tag": "0001_financeiro",
+      "breakpoints": true
     }
   ]
 }

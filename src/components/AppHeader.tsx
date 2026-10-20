@@ -5,7 +5,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccess } from "@/hooks/use-access";
-import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel } from "lucide-react";
+import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel, Wallet, Menu } from "lucide-react";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+
+const SETORES = [
+  { to: "/estoque", label: "Estoque", Icon: Boxes },
+  { to: "/diarias", label: "Diárias", Icon: CalendarDays },
+  { to: "/devolucoes", label: "Devoluções", Icon: Undo2 },
+  { to: "/epi", label: "EPI", Icon: HardHat },
+  { to: "/bags", label: "Bags", Icon: ShoppingBag },
+  { to: "/abastecimento", label: "Abastecimento", Icon: Fuel },
+  { to: "/financeiro", label: "Financeiro", Icon: Wallet },
+] as const;
+
 
 export function AppHeader({ title }: { title: string }) {
   const { user } = useAuth();
@@ -37,44 +49,32 @@ export function AppHeader({ title }: { title: string }) {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          <nav className="hidden items-center gap-1 md:flex">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/estoque">
-                <Boxes className="mr-2 h-4 w-4" />
-                Estoque
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/diarias">
-                <CalendarDays className="mr-2 h-4 w-4" />
-                Diárias
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/devolucoes">
-                <Undo2 className="mr-2 h-4 w-4" />
-                Devoluções
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/epi">
-                <HardHat className="mr-2 h-4 w-4" />
-                EPI
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/bags">
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                Bags
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/abastecimento">
-                <Fuel className="mr-2 h-4 w-4" />
-                Abastecimento
-              </Link>
-            </Button>
-          </nav>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="Abrir menu de setores">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72">
+              <SheetHeader>
+                <SheetTitle>Setores</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-4 grid gap-1">
+                {SETORES.map(({ to, label, Icon }) => (
+                  <SheetClose asChild key={to}>
+                    <Link
+                      to={to}
+                      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent"
+                      activeProps={{ className: "bg-accent" }}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </Link>
+                  </SheetClose>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
           {somenteLeitura && (
             <span className="hidden rounded-full border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
               Somente leitura
