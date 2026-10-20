@@ -83,8 +83,8 @@ function CentroPage() {
 
   const salvar = async () => {
     if (!form || salvando) return;
-    if (!form.descricao.trim()) return toast.error("Informe a descrição.");
-    if (!(form.valor > 0)) return toast.error("Informe um valor maior que zero.");
+    if (!form.descricao.trim()) { toast.error("Informe a descrição."); return; }
+    if (!(form.valor > 0)) { toast.error("Informe um valor maior que zero."); return; }
     setSalvando(true);
     try {
       await salvarGasto(form, editId);

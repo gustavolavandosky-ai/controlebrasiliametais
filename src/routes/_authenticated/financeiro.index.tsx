@@ -50,7 +50,7 @@ function FinanceiroPage() {
   const totalMes = gastos.filter((g) => g.data.startsWith(mesAtual)).reduce((s, g) => s + g.valor, 0);
 
   const criar = async () => {
-    if (!nome.trim()) return toast.error("Informe o nome.");
+    if (!nome.trim()) { toast.error("Informe o nome."); return; }
     setSalvando(true);
     try {
       await salvarCentro({ nome: nome.trim(), descricao: descricao.trim() });
