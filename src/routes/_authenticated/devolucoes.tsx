@@ -28,8 +28,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Plus, Search } from "lucide-react";
+import { FileText, MoreHorizontal, Plus, Search } from "lucide-react";
 import { DevolucaoSheet } from "@/components/DevolucaoSheet";
+import { DevolucaoRelatorio } from "@/components/DevolucaoRelatorio";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAccess } from "@/hooks/use-access";
 import {
   calcularDiferenca,
@@ -117,6 +119,27 @@ function DevolucoesPage() {
   const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
   const visiveis = lista.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
+
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+  const [relatorio, setRelatorio] = useState<Devolucao[] | null>(null);
+  const alternar = (id: string) =>
+    setSelecionados((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  const todosPagina = visiveis.length > 0 && visiveis.every((d) => selecionados.has(d.id));
+  const alternarPagina = () =>
+    setSelecionados((s) => {
+      const n = new Set(s);
+      for (const d of visiveis) {
+        if (todosPagina) n.delete(d.id);
+        else n.add(d.id);
+      }
+      return n;
+    });
+
 
   const confirmarExclusao = async () => {
     if (!excluir) return;
@@ -223,10 +246,37 @@ function DevolucoesPage() {
           )}
         </div>
 
+        {selecionados.size > 0 && (
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/40 px-4 py-2">
+            <span className="text-sm">
+              {selecionados.size} {selecionados.size === 1 ? "lançamento selecionado" : "lançamentos selecionados"}
+            </span>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setSelecionados(new Set())}>
+                Limpar seleção
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setRelatorio(devolucoes.filter((d) => selecionados.has(d.id)))}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Gerar relatório agrupado
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    aria-label="Selecionar todos da página"
+                    checked={todosPagina}
+                    onCheckedChange={alternarPagina}
+                  />
+                </TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Empresa</TableHead>
                 <TableHead>Material</TableHead>
@@ -240,14 +290,14 @@ function DevolucoesPage() {
             <TableBody>
               {carregando && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground">
                     Carregando...
                   </TableCell>
                 </TableRow>
               )}
               {!carregando && visiveis.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground">
                     Nenhuma devolução registrada.
                   </TableCell>
                 </TableRow>
@@ -265,6 +315,13 @@ function DevolucoesPage() {
                       setSheetOpen(true);
                     }}
                   >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        aria-label="Selecionar lançamento"
+                        checked={selecionados.has(d.id)}
+                        onCheckedChange={() => alternar(d.id)}
+                      />
+                    </TableCell>
                     <TableCell>{formatarData(d.data)}</TableCell>
                     <TableCell className="font-medium">{d.empresa}</TableCell>
                     <TableCell>{d.material}</TableCell>
@@ -289,7 +346,6 @@ function DevolucoesPage() {
                       {d.observacao}
                     </TableCell>
                     <TableCell>
-                      {!somenteLeitura && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -304,24 +360,36 @@ function DevolucoesPage() {
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setAlvo(d);
-                                setSheetOpen(true);
+                                setRelatorio([d]);
                               }}
                             >
-                              Editar
+                              <FileText className="mr-2 h-4 w-4" />
+                              Gerar relatório
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExcluir(d);
-                              }}
-                            >
-                              Excluir
-                            </DropdownMenuItem>
+                            {!somenteLeitura && (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAlvo(d);
+                                    setSheetOpen(true);
+                                  }}
+                                >
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExcluir(d);
+                                  }}
+                                >
+                                  Excluir
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      )}
                     </TableCell>
                   </TableRow>
                 );
