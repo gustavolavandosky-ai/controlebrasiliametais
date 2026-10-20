@@ -22,6 +22,8 @@ import { Route as AuthenticatedDiariasIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_authenticated/diarias.cadastros'
 import { Route as AuthenticatedEpiIndexRouteImport } from './routes/_authenticated/epi.index'
 import { Route as AuthenticatedEpiEquipamentosRouteImport } from './routes/_authenticated/epi.equipamentos'
+import { Route as AuthenticatedFinanceiroIndexRouteImport } from './routes/_authenticated/financeiro.index'
+import { Route as AuthenticatedFinanceiroIdRouteImport } from './routes/_authenticated/financeiro.$id'
 import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
 import { Route as AuthenticatedEpiItemIdRouteImport } from './routes/_authenticated/epi.item.$id'
 
@@ -93,6 +95,18 @@ const AuthenticatedEpiEquipamentosRoute =
     path: '/epi/equipamentos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinanceiroIndexRoute =
+  AuthenticatedFinanceiroIndexRouteImport.update({
+    id: '/financeiro/',
+    path: '/financeiro/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceiroIdRoute =
+  AuthenticatedFinanceiroIdRouteImport.update({
+    id: '/financeiro/$id',
+    path: '/financeiro/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -115,9 +129,11 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
+  '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/epi/': typeof AuthenticatedEpiIndexRoute
+  '/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesByTo {
@@ -131,9 +147,11 @@ export interface FileRoutesByTo {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
+  '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/diarias': typeof AuthenticatedDiariasIndexRoute
   '/epi': typeof AuthenticatedEpiIndexRoute
+  '/financeiro': typeof AuthenticatedFinanceiroIndexRoute
   '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesById {
@@ -149,9 +167,11 @@ export interface FileRoutesById {
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/_authenticated/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
+  '/_authenticated/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
   '/_authenticated/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/_authenticated/epi/': typeof AuthenticatedEpiIndexRoute
+  '/_authenticated/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
   '/_authenticated/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRouteTypes {
@@ -167,9 +187,11 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/diarias/cadastros'
     | '/epi/equipamentos'
+    | '/financeiro/$id'
     | '/produto/$id'
     | '/diarias/'
     | '/epi/'
+    | '/financeiro/'
     | '/epi/item/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -183,9 +205,11 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/diarias/cadastros'
     | '/epi/equipamentos'
+    | '/financeiro/$id'
     | '/produto/$id'
     | '/diarias'
     | '/epi'
+    | '/financeiro'
     | '/epi/item/$id'
   id:
     | '__root__'
@@ -200,9 +224,11 @@ export interface FileRouteTypes {
     | '/_authenticated/produtos'
     | '/_authenticated/diarias/cadastros'
     | '/_authenticated/epi/equipamentos'
+    | '/_authenticated/financeiro/$id'
     | '/_authenticated/produto/$id'
     | '/_authenticated/diarias/'
     | '/_authenticated/epi/'
+    | '/_authenticated/financeiro/'
     | '/_authenticated/epi/item/$id'
   fileRoutesById: FileRoutesById
 }
@@ -305,6 +331,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEpiEquipamentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financeiro/': {
+      id: '/_authenticated/financeiro/'
+      path: '/financeiro'
+      fullPath: '/financeiro/'
+      preLoaderRoute: typeof AuthenticatedFinanceiroIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financeiro/$id': {
+      id: '/_authenticated/financeiro/$id'
+      path: '/financeiro/$id'
+      fullPath: '/financeiro/$id'
+      preLoaderRoute: typeof AuthenticatedFinanceiroIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produto/$id': {
       id: '/_authenticated/produto/$id'
       path: '/produto/$id'
@@ -331,9 +371,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedDiariasCadastrosRoute: typeof AuthenticatedDiariasCadastrosRoute
   AuthenticatedEpiEquipamentosRoute: typeof AuthenticatedEpiEquipamentosRoute
+  AuthenticatedFinanceiroIdRoute: typeof AuthenticatedFinanceiroIdRoute
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
   AuthenticatedDiariasIndexRoute: typeof AuthenticatedDiariasIndexRoute
   AuthenticatedEpiIndexRoute: typeof AuthenticatedEpiIndexRoute
+  AuthenticatedFinanceiroIndexRoute: typeof AuthenticatedFinanceiroIndexRoute
   AuthenticatedEpiItemIdRoute: typeof AuthenticatedEpiItemIdRoute
 }
 
@@ -346,9 +388,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedDiariasCadastrosRoute: AuthenticatedDiariasCadastrosRoute,
   AuthenticatedEpiEquipamentosRoute: AuthenticatedEpiEquipamentosRoute,
+  AuthenticatedFinanceiroIdRoute: AuthenticatedFinanceiroIdRoute,
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
   AuthenticatedDiariasIndexRoute: AuthenticatedDiariasIndexRoute,
   AuthenticatedEpiIndexRoute: AuthenticatedEpiIndexRoute,
+  AuthenticatedFinanceiroIndexRoute: AuthenticatedFinanceiroIndexRoute,
   AuthenticatedEpiItemIdRoute: AuthenticatedEpiItemIdRoute,
 }
 
