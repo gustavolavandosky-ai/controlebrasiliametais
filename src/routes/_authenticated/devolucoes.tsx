@@ -426,6 +426,13 @@ function DevolucoesPage() {
       </main>
 
       <DevolucaoSheet devolucao={alvo} open={sheetOpen} onOpenChange={setSheetOpen} />
+      <DevolucaoRelatorio
+        itens={relatorio ?? []}
+        open={relatorio !== null}
+        onOpenChange={(v) => {
+          if (!v) setRelatorio(null);
+        }}
+      />
 
       <AlertDialog
         open={excluir !== null}
