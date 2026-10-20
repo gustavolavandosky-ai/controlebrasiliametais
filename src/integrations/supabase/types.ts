@@ -109,6 +109,33 @@ export type Database = {
         }
         Relationships: []
       }
+      centros_custo: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          nome: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          nome: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           created_at: string
@@ -398,6 +425,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      gastos: {
+        Row: {
+          categoria: string
+          centro_id: string
+          created_at: string
+          data: string
+          descricao: string
+          forma_pagamento: string
+          fornecedor: string
+          id: string
+          nota_fiscal: string
+          observacao: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          categoria?: string
+          centro_id: string
+          created_at?: string
+          data?: string
+          descricao?: string
+          forma_pagamento?: string
+          fornecedor?: string
+          id?: string
+          nota_fiscal?: string
+          observacao?: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+        }
+        Update: {
+          categoria?: string
+          centro_id?: string
+          created_at?: string
+          data?: string
+          descricao?: string
+          forma_pagamento?: string
+          fornecedor?: string
+          id?: string
+          nota_fiscal?: string
+          observacao?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gastos_centro_id_fkey"
+            columns: ["centro_id"]
+            isOneToOne: false
+            referencedRelation: "centros_custo"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lancamentos: {
         Row: {
