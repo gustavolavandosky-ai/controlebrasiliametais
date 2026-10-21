@@ -16,6 +16,7 @@ const SETORES = [
   { to: "/bags", label: "Bags", Icon: ShoppingBag },
   { to: "/abastecimento", label: "Abastecimento", Icon: Fuel },
   { to: "/financeiro", label: "Financeiro", Icon: Wallet },
+  { to: "/viagens", label: "Viagens", Icon: Route },
 ] as const;
 
 
