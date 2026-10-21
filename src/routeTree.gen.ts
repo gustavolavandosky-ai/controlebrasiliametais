@@ -18,6 +18,7 @@ import { Route as AuthenticatedBagsRouteImport } from './routes/_authenticated/b
 import { Route as AuthenticatedDevolucoesRouteImport } from './routes/_authenticated/devolucoes'
 import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedViagensRouteImport } from './routes/_authenticated/viagens'
 import { Route as AuthenticatedDiariasIndexRouteImport } from './routes/_authenticated/diarias.index'
 import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_authenticated/diarias.cadastros'
 import { Route as AuthenticatedEpiIndexRouteImport } from './routes/_authenticated/epi.index'
@@ -70,6 +71,11 @@ const AuthenticatedEstoqueRoute = AuthenticatedEstoqueRouteImport.update({
 const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedViagensRoute = AuthenticatedViagensRouteImport.update({
+  id: '/viagens',
+  path: '/viagens',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDiariasIndexRoute =
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/viagens': typeof AuthenticatedViagensRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/viagens': typeof AuthenticatedViagensRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/viagens': typeof AuthenticatedViagensRoute
   '/_authenticated/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
   '/_authenticated/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/_authenticated/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/devolucoes'
     | '/estoque'
     | '/produtos'
+    | '/viagens'
     | '/diarias/cadastros'
     | '/epi/equipamentos'
     | '/financeiro/$id'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/devolucoes'
     | '/estoque'
     | '/produtos'
+    | '/viagens'
     | '/diarias/cadastros'
     | '/epi/equipamentos'
     | '/financeiro/$id'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated/devolucoes'
     | '/_authenticated/estoque'
     | '/_authenticated/produtos'
+    | '/_authenticated/viagens'
     | '/_authenticated/diarias/cadastros'
     | '/_authenticated/epi/equipamentos'
     | '/_authenticated/financeiro/$id'
@@ -303,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/viagens': {
+      id: '/_authenticated/viagens'
+      path: '/viagens'
+      fullPath: '/viagens'
+      preLoaderRoute: typeof AuthenticatedViagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/diarias/': {
       id: '/_authenticated/diarias/'
       path: '/diarias'
@@ -369,6 +388,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDevolucoesRoute: typeof AuthenticatedDevolucoesRoute
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedViagensRoute: typeof AuthenticatedViagensRoute
   AuthenticatedDiariasCadastrosRoute: typeof AuthenticatedDiariasCadastrosRoute
   AuthenticatedEpiEquipamentosRoute: typeof AuthenticatedEpiEquipamentosRoute
   AuthenticatedFinanceiroIdRoute: typeof AuthenticatedFinanceiroIdRoute
@@ -386,6 +406,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDevolucoesRoute: AuthenticatedDevolucoesRoute,
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedViagensRoute: AuthenticatedViagensRoute,
   AuthenticatedDiariasCadastrosRoute: AuthenticatedDiariasCadastrosRoute,
   AuthenticatedEpiEquipamentosRoute: AuthenticatedEpiEquipamentosRoute,
   AuthenticatedFinanceiroIdRoute: AuthenticatedFinanceiroIdRoute,

@@ -123,7 +123,7 @@ function ViagensPage() {
           <Card icon={<MapPin className="h-5 w-5" />} label="KM estimados" value={`${resumo.km.toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km`} cor="var(--bag-entrada)" />
           <Card icon={<Wallet className="h-5 w-5" />} label="Pedágios" value={brl(resumo.ped)} cor="var(--bag-saida)" />
           <Card icon={<Clock className="h-5 w-5" />} label="Real x estimado (média)"
-            value={resumo.dif == null ? "—" : `${resumo.dif > 0 ? "+" : ""}${fmtTempo(Math.abs(resumo.dif)).replace(/^/, resumo.dif < 0 ? "-" : "")}`}
+            value={resumo.dif == null ? "—" : `${resumo.dif > 0 ? "+" : resumo.dif < 0 ? "-" : ""}${fmtTempo(Math.abs(resumo.dif))}`}
             cor="var(--bag-balanco)" />
         </div>
 

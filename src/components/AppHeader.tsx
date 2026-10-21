@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccess } from "@/hooks/use-access";
-import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel, Wallet, Menu } from "lucide-react";
+import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel, Wallet, Menu, Route } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const SETORES = [
