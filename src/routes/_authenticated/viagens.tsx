@@ -81,7 +81,7 @@ function ViagensPage() {
   }
 
   async function onCalcular() {
-    if (!form?.origem.trim() || !form.destino.trim()) return toast.error("Preencha origem e destino.");
+    if (!form?.origem.trim() || !form.destino.trim()) { toast.error("Preencha origem e destino."); return; }
     setCalculando(true);
     try {
       const r = await calcular({ data: { origem: form.origem, destino: form.destino } });
@@ -93,7 +93,7 @@ function ViagensPage() {
 
   async function onSalvar() {
     if (!form || trava.current) return;
-    if (!form.origem.trim() || !form.destino.trim()) return toast.error("Preencha origem e destino.");
+    if (!form.origem.trim() || !form.destino.trim()) { toast.error("Preencha origem e destino."); return; }
     const tempoReal = hReal.trim() === "" && mReal.trim() === "" ? null : (Number(hReal || 0) * 60 + Number(mReal || 0));
     trava.current = true; setSalvando(true);
     try {

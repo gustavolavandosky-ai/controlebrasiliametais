@@ -21,8 +21,8 @@ export const estimarRota = createServerFn({ method: "POST" })
     return { origem, destino };
   })
   .handler(async ({ data }): Promise<EstimativaRota> => {
-    const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-    const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+    const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
+    const GOOGLE_MAPS_API_KEY = process.env["GOOGLE_MAPS_API_KEY"];
     if (!LOVABLE_API_KEY || !GOOGLE_MAPS_API_KEY) throw new Error("Google Maps não configurado.");
 
     const res = await fetch(`${GATEWAY_URL}/routes/directions/v2:computeRoutes`, {
