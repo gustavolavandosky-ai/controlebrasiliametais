@@ -664,6 +664,68 @@ export type Database = {
         }
         Relationships: []
       }
+      viagens: {
+        Row: {
+          created_at: string
+          data: string
+          destino: string
+          distancia_km: number | null
+          id: string
+          motorista: string
+          observacao: string
+          origem: string
+          pedagio_estimado: number | null
+          pedagio_real: number | null
+          tempo_estimado_min: number | null
+          tempo_real_min: number | null
+          updated_at: string
+          user_id: string
+          veiculo_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          destino: string
+          distancia_km?: number | null
+          id?: string
+          motorista?: string
+          observacao?: string
+          origem: string
+          pedagio_estimado?: number | null
+          pedagio_real?: number | null
+          tempo_estimado_min?: number | null
+          tempo_real_min?: number | null
+          updated_at?: string
+          user_id?: string
+          veiculo_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          destino?: string
+          distancia_km?: number | null
+          id?: string
+          motorista?: string
+          observacao?: string
+          origem?: string
+          pedagio_estimado?: number | null
+          pedagio_real?: number | null
+          tempo_estimado_min?: number | null
+          tempo_real_min?: number | null
+          updated_at?: string
+          user_id?: string
+          veiculo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "viagens_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
