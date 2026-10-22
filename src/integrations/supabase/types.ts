@@ -136,6 +136,36 @@ export type Database = {
         }
         Relationships: []
       }
+      clientes_viagem: {
+        Row: {
+          created_at: string
+          endereco: string
+          id: string
+          nome: string
+          observacao: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endereco?: string
+          id?: string
+          nome: string
+          observacao?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          endereco?: string
+          id?: string
+          nome?: string
+          observacao?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           created_at: string
@@ -304,6 +334,27 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
+        }
+        Relationships: []
+      }
+      empresa_config: {
+        Row: {
+          created_at: string
+          endereco: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endereco?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          endereco?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -666,16 +717,24 @@ export type Database = {
       }
       viagens: {
         Row: {
+          chegada_em: string | null
+          cliente_id: string | null
           created_at: string
           data: string
           destino: string
           distancia_km: number | null
+          houve_parada: boolean
           id: string
           motorista: string
           observacao: string
           origem: string
+          paradas_justificativa: string
+          paradas_min: number
+          paradas_qtd: number
           pedagio_estimado: number | null
           pedagio_real: number | null
+          saida_em: string | null
+          saiu_empresa: boolean
           tempo_estimado_min: number | null
           tempo_real_min: number | null
           updated_at: string
@@ -683,16 +742,24 @@ export type Database = {
           veiculo_id: string | null
         }
         Insert: {
+          chegada_em?: string | null
+          cliente_id?: string | null
           created_at?: string
           data?: string
           destino: string
           distancia_km?: number | null
+          houve_parada?: boolean
           id?: string
           motorista?: string
           observacao?: string
           origem: string
+          paradas_justificativa?: string
+          paradas_min?: number
+          paradas_qtd?: number
           pedagio_estimado?: number | null
           pedagio_real?: number | null
+          saida_em?: string | null
+          saiu_empresa?: boolean
           tempo_estimado_min?: number | null
           tempo_real_min?: number | null
           updated_at?: string
@@ -700,16 +767,24 @@ export type Database = {
           veiculo_id?: string | null
         }
         Update: {
+          chegada_em?: string | null
+          cliente_id?: string | null
           created_at?: string
           data?: string
           destino?: string
           distancia_km?: number | null
+          houve_parada?: boolean
           id?: string
           motorista?: string
           observacao?: string
           origem?: string
+          paradas_justificativa?: string
+          paradas_min?: number
+          paradas_qtd?: number
           pedagio_estimado?: number | null
           pedagio_real?: number | null
+          saida_em?: string | null
+          saiu_empresa?: boolean
           tempo_estimado_min?: number | null
           tempo_real_min?: number | null
           updated_at?: string
@@ -717,6 +792,13 @@ export type Database = {
           veiculo_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "viagens_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes_viagem"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "viagens_veiculo_id_fkey"
             columns: ["veiculo_id"]
