@@ -6,10 +6,9 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 export interface EstimativaRota {
   distanciaKm: number;
   tempoMin: number;
-  pedagio: number | null;
 }
 
-/** Calcula distância, tempo e pedágios entre dois endereços (Google Routes). */
+/** Calcula distância e tempo entre dois endereços (Google Routes). */
 export const estimarRota = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { origem: string; destino: string }) => {
@@ -31,14 +30,13 @@ export const estimarRota = createServerFn({ method: "POST" })
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "X-Connection-Api-Key": GOOGLE_MAPS_API_KEY,
         "Content-Type": "application/json",
-        "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.travelAdvisory.tollInfo",
+        "X-Goog-FieldMask": "routes.distanceMeters,routes.duration",
       },
       body: JSON.stringify({
         origin: { address: data.origem },
         destination: { address: data.destino },
         travelMode: "DRIVE",
         routingPreference: "TRAFFIC_UNAWARE",
-        extraComputations: ["TOLLS"],
         languageCode: "pt-BR",
         regionCode: "BR",
       }),
@@ -52,16 +50,8 @@ export const estimarRota = createServerFn({ method: "POST" })
     const r = json?.routes?.[0];
     if (!r || typeof r.duration !== "string") throw new Error("Rota não encontrada para esses endereços.");
     const seg = parseFloat(r.duration.replace("s", ""));
-    const prices: any[] = r.travelAdvisory?.tollInfo?.estimatedPrice ?? [];
-    let pedagio: number | null = null;
-    if (r.travelAdvisory?.tollInfo) {
-      pedagio = prices
-        .filter((p) => !p.currencyCode || p.currencyCode === "BRL")
-        .reduce((s, p) => s + Number(p.units ?? 0) + Number(p.nanos ?? 0) / 1e9, 0);
-    } else pedagio = 0;
     return {
       distanciaKm: Number(r.distanceMeters ?? 0) / 1000,
       tempoMin: Math.round(seg / 60),
-      pedagio,
     };
   });
