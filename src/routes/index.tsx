@@ -38,7 +38,7 @@ function Landing() {
       <div className="max-w-lg text-center">
         <Boxes className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-          ERP · Controle de Estoque
+          ERP - BRASILIA METAIS
         </h1>
         <p className="mt-3 text-muted-foreground">
           Seus produtos e lançamentos ficam salvos na nuvem — acesse os mesmos dados

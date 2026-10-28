@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the global visual theme and fixed decorative background in `src/styles.css`, using semantic tokens and the existing logo asset, so every route and portal stays consistent without changing business logic.
