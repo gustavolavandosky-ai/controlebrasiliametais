@@ -42,14 +42,14 @@ export function AppHeader({ title }: { title: string }) {
 
   return (
     <header className="border-b bg-card">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <Link to="/estoque" className="flex flex-col">
-          <span className="text-lg font-semibold tracking-tight">{title}</span>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-6">
+        <Link to="/estoque" className="flex min-w-0 flex-col">
+          <span className="break-words text-base font-semibold sm:text-lg">{title}</span>
           <span className="text-xs text-muted-foreground">
-            ERP · Controle de Estoque
+            ERP - BRASILIA METAIS
           </span>
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" aria-label="Abrir menu de setores">
@@ -82,10 +82,10 @@ export function AppHeader({ title }: { title: string }) {
             </span>
           )}
           {isAdmin && (
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild variant="ghost" size="sm" aria-label="Acessos">
               <Link to="/acessos">
-                <Users className="mr-2 h-4 w-4" />
-                Acessos
+                <Users className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Acessos</span>
               </Link>
             </Button>
           )}
@@ -102,7 +102,7 @@ export function AppHeader({ title }: { title: string }) {
             width={40}
             height={40}
             loading="lazy"
-            className="h-10 w-10 rounded-md object-contain"
+            className="hidden h-10 w-10 rounded-md object-contain sm:block"
           />
         </div>
       </div>

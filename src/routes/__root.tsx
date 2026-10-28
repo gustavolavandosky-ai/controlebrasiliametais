@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#0f172a" },
+      { name: "theme-color", content: "#101112" },
       { name: "application-name", content: "Controle Brasília Metais" },
       { name: "apple-mobile-web-app-title", content: "Brasília Metais" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -94,8 +94,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "ERP Brasilia Metais" },
       { name: "twitter:description", content: "Sistema ERP de controle de estoque." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a3ee3223-93d8-43df-a85f-68a4f3f96b4d/id-preview-6bbfd838--a6dae8bc-5836-431a-9acd-3e6a47b54c75.lovable.app-1785976377216.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a3ee3223-93d8-43df-a85f-68a4f3f96b4d/id-preview-6bbfd838--a6dae8bc-5836-431a-9acd-3e6a47b54c75.lovable.app-1785976377216.png" },
     ],
     links: [
       {
@@ -115,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR" className="dark">
       <head>
         <HeadContent />
       </head>
