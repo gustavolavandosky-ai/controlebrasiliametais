@@ -10,7 +10,8 @@ export interface CentroCusto {
 
 export interface Gasto {
   id: string;
-  centroId: string;
+  centroId: string | null;
+  veiculoId?: string | null;
   data: string;
   descricao: string;
   categoria: string;
@@ -62,7 +63,8 @@ async function fetchGastos(): Promise<Gasto[]> {
     out.push(
       ...rows.map((r) => ({
         id: r.id,
-        centroId: r.centro_id,
+        centroId: r.centro_id ?? null,
+        veiculoId: (r as any).veiculo_id ?? null,
         data: r.data,
         descricao: r.descricao ?? "",
         categoria: r.categoria ?? "",
@@ -81,7 +83,8 @@ async function fetchGastos(): Promise<Gasto[]> {
 
 function toRow(g: GastoInput) {
   return {
-    centro_id: g.centroId,
+    centro_id: g.centroId || null,
+    ...(g.veiculoId !== undefined ? { veiculo_id: g.veiculoId || null } : {}),
     data: g.data,
     descricao: g.descricao,
     categoria: g.categoria,
