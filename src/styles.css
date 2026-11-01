@@ -96,8 +96,8 @@
   --ring: var(--primary);
   --overlay: oklch(0 0 0 / 68%);
   --glass-shadow: 0 8px 32px oklch(0 0 0 / 24%);
-  --backdrop-image: url("./assets/logo.png");
-  --backdrop-tint: oklch(0 0 0 / 66%);
+  --backdrop-image: url("/__l5e/assets-v1/c0a6a433-f207-41c2-80d9-673e70860cb9/brasilia-metais-fundo.png");
+  --backdrop-tint: oklch(0 0 0 / 45%);
   --chart-1: oklch(0.76 0.15 55);
   --chart-2: oklch(0.75 0.13 175);
   --chart-3: oklch(0.75 0.13 245);
@@ -148,9 +148,9 @@
     pointer-events: none;
     background-image: linear-gradient(var(--backdrop-tint), var(--backdrop-tint)), var(--backdrop-image);
     background-position: center;
-    background-size: cover, auto min(84vw, 84vh);
+    background-size: cover, cover;
     background-repeat: no-repeat;
-    filter: blur(8px);
+    filter: blur(2px);
   }
   /* Route canvases reveal the shared background; tools retain their own surface. */
   :where(.min-h-screen.bg-background) { background-color: transparent; }
