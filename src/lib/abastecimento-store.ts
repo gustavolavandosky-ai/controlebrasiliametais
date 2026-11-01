@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const COMBUSTIVEIS = ["DIESEL", "GASOLINA", "ETANOL", "GNV"] as const;
 
-export interface Veiculo { id: string; placa: string; modelo: string; ano: string; observacoes: string }
+export interface Veiculo { id: string; placa: string; modelo: string; ano: string; observacoes: string; kmAtual?: number | null }
 export type VeiculoInput = Omit<Veiculo, "id">;
 
 export interface Abastecimento {
@@ -31,7 +31,7 @@ async function fetchPaged(table: "veiculos" | "abastecimentos") {
   return out;
 }
 
-const mapV = (r: any): Veiculo => ({ id: r.id, placa: r.placa, modelo: r.modelo, ano: r.ano, observacoes: r.observacoes });
+const mapV = (r: any): Veiculo => ({ id: r.id, placa: r.placa, modelo: r.modelo, ano: r.ano, observacoes: r.observacoes, kmAtual: r.km_atual == null ? null : Number(r.km_atual) });
 const mapA = (r: any): Abastecimento => ({
   id: r.id, veiculoId: r.veiculo_id, data: r.data, combustivel: r.combustivel,
   valor: Number(r.valor), litros: Number(r.litros),
@@ -89,8 +89,8 @@ export function useAbastecimento() {
 
   const salvarVeiculo = useCallback(async (v: VeiculoInput, id?: string) => {
     const { error } = id
-      ? await supabase.from("veiculos").update(v).eq("id", id)
-      : await supabase.from("veiculos").insert({ user_id: await uid(), ...v });
+      ? await supabase.from("veiculos").update({ placa: v.placa, modelo: v.modelo, ano: v.ano, observacoes: v.observacoes }).eq("id", id)
+      : await supabase.from("veiculos").insert({ user_id: await uid(), placa: v.placa, modelo: v.modelo, ano: v.ano, observacoes: v.observacoes });
     if (error) throw error;
     await refetch();
   }, [refetch]);

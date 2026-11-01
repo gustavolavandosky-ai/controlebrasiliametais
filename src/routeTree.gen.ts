@@ -26,6 +26,8 @@ import { Route as AuthenticatedEpiEquipamentosRouteImport } from './routes/_auth
 import { Route as AuthenticatedFinanceiroIndexRouteImport } from './routes/_authenticated/financeiro.index'
 import { Route as AuthenticatedFinanceiroIdRouteImport } from './routes/_authenticated/financeiro.$id'
 import { Route as AuthenticatedProdutoIdRouteImport } from './routes/_authenticated/produto.$id'
+import { Route as AuthenticatedVeiculosIndexRouteImport } from './routes/_authenticated/veiculos.index'
+import { Route as AuthenticatedVeiculosIdRouteImport } from './routes/_authenticated/veiculos.$id'
 import { Route as AuthenticatedEpiItemIdRouteImport } from './routes/_authenticated/epi.item.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -118,6 +120,17 @@ const AuthenticatedProdutoIdRoute = AuthenticatedProdutoIdRouteImport.update({
   path: '/produto/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVeiculosIndexRoute =
+  AuthenticatedVeiculosIndexRouteImport.update({
+    id: '/veiculos/',
+    path: '/veiculos/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedVeiculosIdRoute = AuthenticatedVeiculosIdRouteImport.update({
+  id: '/veiculos/$id',
+  path: '/veiculos/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEpiItemIdRoute = AuthenticatedEpiItemIdRouteImport.update({
   id: '/epi/item/$id',
   path: '/epi/item/$id',
@@ -138,9 +151,11 @@ export interface FileRoutesByFullPath {
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/veiculos/$id': typeof AuthenticatedVeiculosIdRoute
   '/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/epi/': typeof AuthenticatedEpiIndexRoute
   '/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
+  '/veiculos/': typeof AuthenticatedVeiculosIndexRoute
   '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesByTo {
@@ -157,9 +172,11 @@ export interface FileRoutesByTo {
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/veiculos/$id': typeof AuthenticatedVeiculosIdRoute
   '/diarias': typeof AuthenticatedDiariasIndexRoute
   '/epi': typeof AuthenticatedEpiIndexRoute
   '/financeiro': typeof AuthenticatedFinanceiroIndexRoute
+  '/veiculos': typeof AuthenticatedVeiculosIndexRoute
   '/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRoutesById {
@@ -178,9 +195,11 @@ export interface FileRoutesById {
   '/_authenticated/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/_authenticated/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
+  '/_authenticated/veiculos/$id': typeof AuthenticatedVeiculosIdRoute
   '/_authenticated/diarias/': typeof AuthenticatedDiariasIndexRoute
   '/_authenticated/epi/': typeof AuthenticatedEpiIndexRoute
   '/_authenticated/financeiro/': typeof AuthenticatedFinanceiroIndexRoute
+  '/_authenticated/veiculos/': typeof AuthenticatedVeiculosIndexRoute
   '/_authenticated/epi/item/$id': typeof AuthenticatedEpiItemIdRoute
 }
 export interface FileRouteTypes {
@@ -199,9 +218,11 @@ export interface FileRouteTypes {
     | '/epi/equipamentos'
     | '/financeiro/$id'
     | '/produto/$id'
+    | '/veiculos/$id'
     | '/diarias/'
     | '/epi/'
     | '/financeiro/'
+    | '/veiculos/'
     | '/epi/item/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,9 +239,11 @@ export interface FileRouteTypes {
     | '/epi/equipamentos'
     | '/financeiro/$id'
     | '/produto/$id'
+    | '/veiculos/$id'
     | '/diarias'
     | '/epi'
     | '/financeiro'
+    | '/veiculos'
     | '/epi/item/$id'
   id:
     | '__root__'
@@ -238,9 +261,11 @@ export interface FileRouteTypes {
     | '/_authenticated/epi/equipamentos'
     | '/_authenticated/financeiro/$id'
     | '/_authenticated/produto/$id'
+    | '/_authenticated/veiculos/$id'
     | '/_authenticated/diarias/'
     | '/_authenticated/epi/'
     | '/_authenticated/financeiro/'
+    | '/_authenticated/veiculos/'
     | '/_authenticated/epi/item/$id'
   fileRoutesById: FileRoutesById
 }
@@ -371,6 +396,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProdutoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/veiculos/': {
+      id: '/_authenticated/veiculos/'
+      path: '/veiculos'
+      fullPath: '/veiculos/'
+      preLoaderRoute: typeof AuthenticatedVeiculosIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/veiculos/$id': {
+      id: '/_authenticated/veiculos/$id'
+      path: '/veiculos/$id'
+      fullPath: '/veiculos/$id'
+      preLoaderRoute: typeof AuthenticatedVeiculosIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/epi/item/$id': {
       id: '/_authenticated/epi/item/$id'
       path: '/epi/item/$id'
@@ -393,9 +432,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEpiEquipamentosRoute: typeof AuthenticatedEpiEquipamentosRoute
   AuthenticatedFinanceiroIdRoute: typeof AuthenticatedFinanceiroIdRoute
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
+  AuthenticatedVeiculosIdRoute: typeof AuthenticatedVeiculosIdRoute
   AuthenticatedDiariasIndexRoute: typeof AuthenticatedDiariasIndexRoute
   AuthenticatedEpiIndexRoute: typeof AuthenticatedEpiIndexRoute
   AuthenticatedFinanceiroIndexRoute: typeof AuthenticatedFinanceiroIndexRoute
+  AuthenticatedVeiculosIndexRoute: typeof AuthenticatedVeiculosIndexRoute
   AuthenticatedEpiItemIdRoute: typeof AuthenticatedEpiItemIdRoute
 }
 
@@ -411,9 +452,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEpiEquipamentosRoute: AuthenticatedEpiEquipamentosRoute,
   AuthenticatedFinanceiroIdRoute: AuthenticatedFinanceiroIdRoute,
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,
+  AuthenticatedVeiculosIdRoute: AuthenticatedVeiculosIdRoute,
   AuthenticatedDiariasIndexRoute: AuthenticatedDiariasIndexRoute,
   AuthenticatedEpiIndexRoute: AuthenticatedEpiIndexRoute,
   AuthenticatedFinanceiroIndexRoute: AuthenticatedFinanceiroIndexRoute,
+  AuthenticatedVeiculosIndexRoute: AuthenticatedVeiculosIndexRoute,
   AuthenticatedEpiItemIdRoute: AuthenticatedEpiItemIdRoute,
 }
 

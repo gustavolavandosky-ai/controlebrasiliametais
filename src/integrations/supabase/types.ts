@@ -480,7 +480,7 @@ export type Database = {
       gastos: {
         Row: {
           categoria: string
-          centro_id: string
+          centro_id: string | null
           created_at: string
           data: string
           descricao: string
@@ -492,10 +492,11 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
+          veiculo_id: string | null
         }
         Insert: {
           categoria?: string
-          centro_id: string
+          centro_id?: string | null
           created_at?: string
           data?: string
           descricao?: string
@@ -507,10 +508,11 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor?: number
+          veiculo_id?: string | null
         }
         Update: {
           categoria?: string
-          centro_id?: string
+          centro_id?: string | null
           created_at?: string
           data?: string
           descricao?: string
@@ -522,6 +524,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
+          veiculo_id?: string | null
         }
         Relationships: [
           {
@@ -529,6 +532,54 @@ export type Database = {
             columns: ["centro_id"]
             isOneToOne: false
             referencedRelation: "centros_custo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gastos_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      km_auditoria: {
+        Row: {
+          alterado_por: string
+          created_at: string
+          id: string
+          km_anterior: number | null
+          km_novo: number
+          motivo: string
+          user_id: string
+          veiculo_id: string
+        }
+        Insert: {
+          alterado_por: string
+          created_at?: string
+          id?: string
+          km_anterior?: number | null
+          km_novo: number
+          motivo: string
+          user_id: string
+          veiculo_id: string
+        }
+        Update: {
+          alterado_por?: string
+          created_at?: string
+          id?: string
+          km_anterior?: number | null
+          km_novo?: number
+          motivo?: string
+          user_id?: string
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "km_auditoria_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -579,6 +630,65 @@ export type Database = {
             columns: ["produto_id"]
             isOneToOne: false
             referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manutencoes: {
+        Row: {
+          created_at: string
+          data: string
+          descricao: string
+          fornecedor: string
+          id: string
+          km: number | null
+          observacao: string
+          proxima_data: string | null
+          proxima_km: number | null
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number
+          veiculo_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          descricao?: string
+          fornecedor?: string
+          id?: string
+          km?: number | null
+          observacao?: string
+          proxima_data?: string | null
+          proxima_km?: number | null
+          tipo?: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+          veiculo_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          descricao?: string
+          fornecedor?: string
+          id?: string
+          km?: number | null
+          observacao?: string
+          proxima_data?: string | null
+          proxima_km?: number | null
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+          veiculo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manutencoes_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -687,6 +797,7 @@ export type Database = {
           ano: string
           created_at: string
           id: string
+          km_atual: number | null
           modelo: string
           observacoes: string
           placa: string
@@ -697,6 +808,7 @@ export type Database = {
           ano?: string
           created_at?: string
           id?: string
+          km_atual?: number | null
           modelo?: string
           observacoes?: string
           placa?: string
@@ -707,6 +819,7 @@ export type Database = {
           ano?: string
           created_at?: string
           id?: string
+          km_atual?: number | null
           modelo?: string
           observacoes?: string
           placa?: string
@@ -813,6 +926,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      corrigir_km_veiculo: {
+        Args: { _km: number; _motivo: string; _veiculo: string }
+        Returns: undefined
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       pode_ver: { Args: { _dono: string }; Returns: boolean }
       registrar_perfil: {
