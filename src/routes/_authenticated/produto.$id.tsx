@@ -45,6 +45,7 @@ import {
   type Lancamento,
 } from "@/lib/inventory-store";
 import { EntrySheet } from "@/components/EntrySheet";
+import { UnidadesPanel } from "@/components/UnidadesPanel";
 import { useAccess } from "@/hooks/use-access";
 import { toast } from "sonner";
 
@@ -220,6 +221,13 @@ function ProdutoDetalhe() {
             </div>
           )}
         </div>
+
+        <UnidadesPanel
+          produto={produto}
+          lancamentos={lancamentos}
+          estoque={calcularEstoque(produto, lancamentos)}
+          somenteLeitura={somenteLeitura}
+        />
 
         <div className="rounded-lg border bg-card">
           <div className="flex flex-wrap items-end gap-3 border-b p-4">

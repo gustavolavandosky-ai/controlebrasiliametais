@@ -16,6 +16,8 @@ export interface Lancamento {
   data: string; // yyyy-mm-dd
   hora: string; // HH:mm
   observacao: string;
+  /** Fardos (MATERIAL ENFARDADO). null = não informado. */
+  fardos?: number | null;
   createdAt: number;
 }
 
@@ -84,6 +86,7 @@ async function fetchLancamentos(): Promise<Lancamento[]> {
     data: r.data,
     hora: r.hora,
     observacao: r.observacao ?? "",
+    fardos: r.fardos ?? null,
     createdAt: new Date(r.created_at).getTime(),
   }));
 }
@@ -98,6 +101,7 @@ function mapLancamento(r: any): Lancamento {
     data: r.data,
     hora: r.hora,
     observacao: r.observacao ?? "",
+    fardos: r.fardos ?? null,
     createdAt: new Date(r.created_at).getTime(),
   };
 }
@@ -184,6 +188,7 @@ export function useInventory() {
           data: l.data,
           hora: l.hora,
           observacao: l.observacao ?? "",
+          fardos: l.fardos ?? null,
         })
         .select("*")
         .single();
@@ -209,6 +214,7 @@ export function useInventory() {
           ...(l.data !== undefined ? { data: l.data } : {}),
           ...(l.hora !== undefined ? { hora: l.hora } : {}),
           ...(l.observacao !== undefined ? { observacao: l.observacao } : {}),
+          ...(l.fardos !== undefined ? { fardos: l.fardos } : {}),
         })
         .eq("id", id)
         .select("*")

@@ -26,6 +26,7 @@ import {
   type Lancamento,
 } from "@/lib/inventory-store";
 import { toast } from "sonner";
+import { calcularFardos, controlePorLocal, useApontamentos } from "@/lib/unidades";
 
 interface Props {
   produto: Produto | null;
@@ -43,7 +44,9 @@ function nowTime() {
 }
 
 export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
-  const { addLancamento, updateLancamento } = useInventory();
+  const { addLancamento, updateLancamento, lancamentos } = useInventory();
+  const { apontamentos } = useApontamentos(produto?.id ?? "");
+  const [fardos, setFardos] = useState("");
   const [tipo, setTipo] = useState<TipoLancamento>("entrada");
   const [quantidade, setQuantidade] = useState("");
   const [unidade, setUnidade] = useState<Unidade>("un");
@@ -62,6 +65,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setData(lancamento.data);
       setHora(lancamento.hora);
       setObservacao(lancamento.observacao ?? "");
+      setFardos(lancamento.fardos != null ? String(lancamento.fardos) : "");
     } else if (produto) {
       setTipo("entrada");
       setQuantidade("");
@@ -69,6 +73,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       setData(nowDate());
       setHora(nowTime());
       setObservacao("");
+      setFardos("");
     }
     salvandoRef.current = false;
     setSalvando(false);
@@ -83,6 +88,31 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
       toast.error("Quantidade inválida");
       return;
     }
+    const enfardado = controlePorLocal(produto.localizacao) === "fardo";
+    let fardosValor: number | null | undefined = undefined;
+    if (enfardado) {
+      if (tipo === "saida") {
+        if (fardos.trim() === "") fardosValor = null;
+        else {
+          const f = Number(fardos);
+          if (!Number.isInteger(f) || f < 0) {
+            toast.error("Fardos deve ser número inteiro");
+            return;
+          }
+          fardosValor = f;
+          const outros = lancamentos.filter(
+            (l) => l.produtoId === produto.id && l.id !== lancamento?.id,
+          );
+          const saldo = calcularFardos(outros, apontamentos).saldo;
+          if (saldo - f < 0 && !window.confirm(`Saldo de fardos ficará negativo (${saldo - f}). Confirmar mesmo assim?`)) return;
+        }
+      } else if (tipo === "entrada") {
+        // Cada novo lançamento de entrada = 1 fardo; edição preserva o valor original.
+        fardosValor = lancamento ? (lancamento.tipo === "entrada" ? undefined : 1) : 1;
+      } else {
+        fardosValor = lancamento ? undefined : null;
+      }
+    }
     salvandoRef.current = true;
     setSalvando(true);
     try {
@@ -94,6 +124,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
           data,
           hora,
           observacao,
+          ...(fardosValor !== undefined ? { fardos: fardosValor } : {}),
         });
         toast.success("Lançamento atualizado");
       } else {
@@ -105,6 +136,7 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
           data,
           hora,
           observacao,
+          fardos: fardosValor ?? null,
         });
         toast.success("Lançamento salvo");
       }
@@ -186,6 +218,23 @@ export function EntrySheet({ produto, lancamento, open, onOpenChange }: Props) {
               <Input id="lancamento-hora" type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
             </div>
           </div>
+
+          {controlePorLocal(produto.localizacao) === "fardo" && tipo === "saida" && (
+            <div className="grid gap-2">
+              <Label htmlFor="lancamento-fardos">Fardos retirados (opcional)</Label>
+              <Input
+                id="lancamento-fardos"
+                inputMode="numeric"
+                value={fardos}
+                onChange={(e) => setFardos(e.target.value)}
+                placeholder="Deixe vazio se só souber o peso"
+              />
+              <p className="text-xs text-muted-foreground">Sem quantidade, o saldo de fardos é mantido e fica pendente de conferência.</p>
+            </div>
+          )}
+          {controlePorLocal(produto.localizacao) === "fardo" && tipo === "entrada" && (
+            <p className="text-xs text-muted-foreground">Material enfardado: cada nova entrada conta como 1 fardo.</p>
+          )}
 
           <div className="grid gap-2">
             <Label htmlFor="lancamento-observacao">Observação</Label>

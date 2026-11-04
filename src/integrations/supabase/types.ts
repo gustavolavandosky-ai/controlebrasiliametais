@@ -588,6 +588,7 @@ export type Database = {
         Row: {
           created_at: string
           data: string
+          fardos: number | null
           hora: string
           id: string
           observacao: string
@@ -601,6 +602,7 @@ export type Database = {
         Insert: {
           created_at?: string
           data?: string
+          fardos?: number | null
           hora?: string
           id?: string
           observacao?: string
@@ -614,6 +616,7 @@ export type Database = {
         Update: {
           created_at?: string
           data?: string
+          fardos?: number | null
           hora?: string
           id?: string
           observacao?: string
@@ -791,6 +794,56 @@ export type Database = {
           valor_padrao?: number
         }
         Relationships: []
+      }
+      unidades_apontamentos: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          justificativa: string
+          peso_kg: number | null
+          produto_id: string
+          quantidade: number
+          responsavel: string
+          saldo_calculado: number | null
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          id?: string
+          justificativa?: string
+          peso_kg?: number | null
+          produto_id: string
+          quantidade: number
+          responsavel?: string
+          saldo_calculado?: number | null
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          justificativa?: string
+          peso_kg?: number | null
+          produto_id?: string
+          quantidade?: number
+          responsavel?: string
+          saldo_calculado?: number | null
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unidades_apontamentos_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       veiculos: {
         Row: {
