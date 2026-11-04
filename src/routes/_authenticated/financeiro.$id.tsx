@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { ArrowLeft, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAccess } from "@/hooks/use-access";
+import { useAbastecimento } from "@/lib/abastecimento-store";
 import {
   FORMAS_PAGAMENTO,
   formatarData,
@@ -37,7 +38,7 @@ const POR_PAGINA = 50;
 const hoje = () => new Date().toISOString().slice(0, 10);
 
 function vazio(centroId: string): GastoInput {
-  return { centroId, data: hoje(), descricao: "", categoria: "", fornecedor: "", formaPagamento: "PIX", notaFiscal: "", valor: 0, observacao: "" };
+  return { centroId, veiculoId: null, data: hoje(), descricao: "", categoria: "", fornecedor: "", formaPagamento: "PIX", notaFiscal: "", valor: 0, observacao: "" };
 }
 
 function CentroPage() {
@@ -47,6 +48,7 @@ function CentroPage() {
   const { somenteLeitura } = useAccess();
   const centro = centros.find((c) => c.id === id);
 
+  const { veiculos } = useAbastecimento();
   const [busca, setBusca] = useState("");
   const [de, setDe] = useState("");
   const [ate, setAte] = useState("");
@@ -265,6 +267,13 @@ function CentroPage() {
                 <Label htmlFor="f-pag">Forma de pagamento</Label>
                 <select id="f-pag" className="h-9 rounded-md border bg-background px-3 text-sm" value={form.formaPagamento} onChange={(e) => set("formaPagamento", e.target.value)}>
                   {FORMAS_PAGAMENTO.map((f) => <option key={f}>{f}</option>)}
+                </select>
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="f-veic">Veículo (opcional)</Label>
+                <select id="f-veic" className="h-9 rounded-md border bg-background px-3 text-sm" value={form.veiculoId ?? ""} onChange={(e) => set("veiculoId", e.target.value || null)}>
+                  <option value="">Nenhum</option>
+                  {veiculos.map((v) => (<option key={v.id} value={v.id}>{v.placa} {v.modelo}</option>))}
                 </select>
               </div>
               <div className="grid gap-1">

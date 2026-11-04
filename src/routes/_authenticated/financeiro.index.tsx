@@ -37,11 +37,11 @@ function FinanceiroPage() {
   const resumo = useMemo(() => {
     const m = new Map<string, { total: number; mes: number; qtd: number }>();
     for (const g of gastos) {
-      const r = m.get(g.centroId) ?? { total: 0, mes: 0, qtd: 0 };
+      const r = m.get(g.centroId ?? "") ?? { total: 0, mes: 0, qtd: 0 };
       r.total += g.valor;
       r.qtd += 1;
       if (g.data.startsWith(mesAtual)) r.mes += g.valor;
-      m.set(g.centroId, r);
+      m.set(g.centroId ?? "", r);
     }
     return m;
   }, [gastos, mesAtual]);
