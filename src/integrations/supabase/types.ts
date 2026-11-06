@@ -643,10 +643,13 @@ export type Database = {
           data: string
           descricao: string
           fornecedor: string
+          horimetro: number | null
           id: string
           km: number | null
+          medida: string
           observacao: string
           proxima_data: string | null
+          proxima_horas: number | null
           proxima_km: number | null
           tipo: string
           updated_at: string
@@ -659,10 +662,13 @@ export type Database = {
           data?: string
           descricao?: string
           fornecedor?: string
+          horimetro?: number | null
           id?: string
           km?: number | null
+          medida?: string
           observacao?: string
           proxima_data?: string | null
+          proxima_horas?: number | null
           proxima_km?: number | null
           tipo?: string
           updated_at?: string
@@ -675,10 +681,13 @@ export type Database = {
           data?: string
           descricao?: string
           fornecedor?: string
+          horimetro?: number | null
           id?: string
           km?: number | null
+          medida?: string
           observacao?: string
           proxima_data?: string | null
+          proxima_horas?: number | null
           proxima_km?: number | null
           tipo?: string
           updated_at?: string

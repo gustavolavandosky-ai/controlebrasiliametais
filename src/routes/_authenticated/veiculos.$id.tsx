@@ -13,7 +13,7 @@ import { useAccess } from "@/hooks/use-access";
 import { useAbastecimento } from "@/lib/abastecimento-store";
 import { useFinanceiro, formatarData, formatarMoeda } from "@/lib/financeiro-store";
 import { useViagens } from "@/lib/viagens-store";
-import { TIPOS_MANUTENCAO, calcularAlertas, fmtKm, kmConhecido, useFrota, type ManutencaoInput } from "@/lib/frota-store";
+import { TIPOS_MANUTENCAO, calcularAlertas, fmtHoras, fmtKm, horasConhecidas, kmConhecido, useFrota, type ManutencaoInput } from "@/lib/frota-store";
 
 export const Route = createFileRoute("/_authenticated/veiculos/$id")({
   head: () => ({
@@ -64,7 +64,10 @@ function VeiculoPage() {
     if (!form) return;
     if (!form.tipo.trim()) return void toast.error("Informe o tipo da manutenção.");
     if (form.valor < 0) return void toast.error("Valor inválido.");
-    if (!editId && form.km != null && km != null && form.km < km)
+    const hAt = horasConhecidas(id, manutencoes);
+    if (form.medida === "horas" && !editId && form.horimetro != null && hAt != null && form.horimetro < hAt)
+      return void toast.error(`Horímetro menor que o último registrado (${fmtHoras(hAt)}).`);
+    if (form.medida === "km" && !editId && form.km != null && km != null && form.km < km)
       return void toast.error(`KM informado é menor que o KM atual (${fmtKm(km)}). Peça a um administrador para corrigir o KM com motivo.`);
     setSalvando(true);
     try { await salvarManutencao(form, editId); toast.success("Manutenção salva"); setForm(null); }
@@ -98,7 +101,7 @@ function VeiculoPage() {
           <div className="flex flex-wrap gap-2">
             {isAdmin && <Button variant="outline" onClick={() => setCorr({ km: "", motivo: "" })}>Corrigir KM</Button>}
             {!somenteLeitura && (
-              <Button onClick={() => { setEditId(undefined); setForm({ veiculoId: id, data: hoje(), km, tipo: "", descricao: "", fornecedor: "", valor: 0, proximaKm: null, proximaData: null, observacao: "" }); }}>
+              <Button onClick={() => { setEditId(undefined); setForm({ veiculoId: id, data: hoje(), km, tipo: "", descricao: "", fornecedor: "", valor: 0, proximaKm: null, proximaData: null, observacao: "", medida: "km", horimetro: null, proximaHoras: null }); }}>
                 <Plus className="mr-2 h-4 w-4" /> Nova manutenção
               </Button>
             )}
@@ -111,6 +114,7 @@ function VeiculoPage() {
               <p key={a.manutencao.id} className={`rounded-md border px-3 py-2 text-sm ${a.status === "atrasada" ? "border-destructive text-destructive" : "border-[color:var(--bag-pendente)] text-[color:var(--bag-pendente)]"}`}>
                 {a.status === "atrasada" ? "Atrasada" : "A vencer"}: {a.manutencao.tipo}
                 {a.manutencao.proximaKm != null && ` · próxima em ${fmtKm(a.manutencao.proximaKm)}`}
+                {a.manutencao.proximaHoras != null && ` · próxima em ${fmtHoras(a.manutencao.proximaHoras)}`}
                 {a.manutencao.proximaData && ` · ${formatarData(a.manutencao.proximaData)}`}
               </p>
             ))}
@@ -132,12 +136,12 @@ function VeiculoPage() {
 
         <Secao titulo={`Manutenções (${mans.length})`}>
           {mans.length === 0 ? <Vazio /> : (
-            <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Tipo</TableHead><TableHead>Serviço</TableHead><TableHead>KM</TableHead><TableHead>Oficina</TableHead><TableHead>Próxima</TableHead><TableHead className="text-right">Valor</TableHead></TableRow></TableHeader>
+            <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Tipo</TableHead><TableHead>Serviço</TableHead><TableHead>KM / Horas</TableHead><TableHead>Oficina</TableHead><TableHead>Próxima</TableHead><TableHead className="text-right">Valor</TableHead></TableRow></TableHeader>
               <TableBody>{mans.map((m) => (
                 <TableRow key={m.id} className={somenteLeitura ? "" : "cursor-pointer"} onClick={() => { if (somenteLeitura) return; setEditId(m.id); setForm({ ...m }); }}>
                   <TableCell>{formatarData(m.data)}</TableCell><TableCell>{m.tipo}</TableCell><TableCell>{m.descricao}</TableCell>
-                  <TableCell>{fmtKm(m.km)}</TableCell><TableCell>{m.fornecedor}</TableCell>
-                  <TableCell>{[m.proximaKm != null ? fmtKm(m.proximaKm) : "", m.proximaData ? formatarData(m.proximaData) : ""].filter(Boolean).join(" / ") || "—"}</TableCell>
+                  <TableCell>{m.medida === "horas" ? fmtHoras(m.horimetro) : fmtKm(m.km)}</TableCell><TableCell>{m.fornecedor}</TableCell>
+                  <TableCell>{[m.proximaKm != null ? fmtKm(m.proximaKm) : "", m.proximaHoras != null ? fmtHoras(m.proximaHoras) : "", m.proximaData ? formatarData(m.proximaData) : ""].filter(Boolean).join(" / ") || "—"}</TableCell>
                   <TableCell className="text-right">{formatarMoeda(m.valor)}</TableCell>
                 </TableRow>))}</TableBody></Table>
           )}
@@ -175,7 +179,13 @@ function VeiculoPage() {
           {form && (
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1"><Label>Data</Label><Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} /></div>
-              <div className="grid gap-1"><Label>KM</Label><Input type="number" value={form.km ?? ""} onChange={(e) => setForm({ ...form, km: e.target.value === "" ? null : Number(e.target.value) })} /></div>
+              <div className="grid gap-1"><Label>Controlar por</Label>
+                <select className="h-9 rounded-md border px-2 text-sm" value={form.medida} onChange={(e) => setForm({ ...form, medida: e.target.value as "km" | "horas" })}>
+                  <option value="km">KM</option><option value="horas">Horas (horímetro)</option>
+                </select></div>
+              {form.medida === "horas"
+                ? <div className="grid gap-1"><Label>Horímetro (h)</Label><Input type="number" step="0.1" value={form.horimetro ?? ""} onChange={(e) => setForm({ ...form, horimetro: e.target.value === "" ? null : Number(e.target.value) })} /></div>
+                : <div className="grid gap-1"><Label>KM</Label><Input type="number" value={form.km ?? ""} onChange={(e) => setForm({ ...form, km: e.target.value === "" ? null : Number(e.target.value) })} /></div>}
               <div className="grid gap-1"><Label>Tipo</Label>
                 <select className="h-9 rounded-md border px-2 text-sm" value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
                   <option value="">Selecione</option>{TIPOS_MANUTENCAO.map((t) => <option key={t}>{t}</option>)}
@@ -183,7 +193,9 @@ function VeiculoPage() {
               <div className="grid gap-1"><Label>Valor (R$)</Label><Input type="number" step="0.01" value={form.valor || ""} onChange={(e) => setForm({ ...form, valor: Number(e.target.value) || 0 })} /></div>
               <div className="grid gap-1 sm:col-span-2"><Label>Serviço / descrição</Label><Input value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} /></div>
               <div className="grid gap-1 sm:col-span-2"><Label>Oficina / fornecedor</Label><Input value={form.fornecedor} onChange={(e) => setForm({ ...form, fornecedor: e.target.value })} /></div>
-              <div className="grid gap-1"><Label>Próxima por KM</Label><Input type="number" value={form.proximaKm ?? ""} onChange={(e) => setForm({ ...form, proximaKm: e.target.value === "" ? null : Number(e.target.value) })} /></div>
+              {form.medida === "horas"
+                ? <div className="grid gap-1"><Label>Próxima por horas (h)</Label><Input type="number" step="0.1" value={form.proximaHoras ?? ""} onChange={(e) => setForm({ ...form, proximaHoras: e.target.value === "" ? null : Number(e.target.value) })} /></div>
+                : <div className="grid gap-1"><Label>Próxima por KM</Label><Input type="number" value={form.proximaKm ?? ""} onChange={(e) => setForm({ ...form, proximaKm: e.target.value === "" ? null : Number(e.target.value) })} /></div>}
               <div className="grid gap-1"><Label>Próxima por data</Label><Input type="date" value={form.proximaData ?? ""} onChange={(e) => setForm({ ...form, proximaData: e.target.value || null })} /></div>
               <div className="grid gap-1 sm:col-span-2"><Label>Observações</Label><Textarea value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} /></div>
             </div>

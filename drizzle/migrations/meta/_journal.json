@@ -36,6 +36,13 @@
       "when": 1793811953519,
       "tag": "0004_unidades_fisicas",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793975409657,
+      "tag": "0005_manutencao_por_horas",
+      "breakpoints": true
     }
   ]
 }

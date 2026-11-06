@@ -55,7 +55,7 @@ function VeiculosPage() {
         <section className="mb-6 rounded-lg border bg-card p-4">
           <h2 className="mb-3 flex items-center gap-2 font-semibold"><AlertTriangle className="h-4 w-4" /> Alertas de manutenção</h2>
           {alertas.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhuma manutenção atrasada ou a vencer (até 1.000 km ou 7 dias).</p>
+            <p className="text-sm text-muted-foreground">Nenhuma manutenção atrasada ou a vencer (até 1.000 km, 50 horas ou 7 dias).</p>
           ) : (
             <ul className="grid gap-2">
               {alertas.map((a) => (
@@ -66,6 +66,7 @@ function VeiculosPage() {
                     <span>
                       {a.status === "atrasada" ? "Atrasada" : "A vencer"}
                       {a.faltamKm != null && ` · ${a.faltamKm < 0 ? `${Math.abs(a.faltamKm).toLocaleString("pt-BR")} km passados` : `faltam ${a.faltamKm.toLocaleString("pt-BR")} km`}`}
+                      {a.faltamHoras != null && ` · ${a.faltamHoras < 0 ? `${Math.abs(a.faltamHoras).toLocaleString("pt-BR")} h passadas` : `faltam ${a.faltamHoras.toLocaleString("pt-BR")} h`}`}
                       {a.manutencao.proximaData && ` · ${formatarData(a.manutencao.proximaData)}`}
                     </span>
                   </Link>

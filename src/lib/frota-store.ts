@@ -10,11 +10,14 @@ export const TIPOS_MANUTENCAO = [
 /** Alertas: vence em até 1.000 km e/ou nos próximos 7 dias. */
 export const ALERTA_KM = 1000;
 export const ALERTA_DIAS = 7;
+export const ALERTA_HORAS = 50;
+export type Medida = "km" | "horas";
 
 export interface Manutencao {
   id: string; veiculoId: string; data: string; km: number | null; tipo: string; descricao: string;
   fornecedor: string; valor: number; proximaKm: number | null; proximaData: string | null;
   observacao: string; createdAt: number;
+  medida: Medida; horimetro: number | null; proximaHoras: number | null;
 }
 export type ManutencaoInput = Omit<Manutencao, "id" | "createdAt">;
 export interface KmAuditoria {
@@ -49,7 +52,14 @@ export function kmConhecido(v: Veiculo, abs: Abastecimento[], mans: Manutencao[]
 }
 
 export type StatusAlerta = "atrasada" | "a_vencer";
-export interface Alerta { manutencao: Manutencao; status: StatusAlerta; faltamKm: number | null; faltamDias: number | null }
+export interface Alerta { manutencao: Manutencao; status: StatusAlerta; faltamKm: number | null; faltamDias: number | null; faltamHoras: number | null }
+
+/** Maior horímetro registrado nas manutenções do veículo. */
+export function horasConhecidas(veiculoId: string, mans: Manutencao[]): number | null {
+  let mx: number | null = null;
+  for (const m of mans) if (m.veiculoId === veiculoId && m.horimetro != null) mx = Math.max(mx ?? 0, m.horimetro);
+  return mx;
+}
 
 function diasAte(d: string, hoje: Date) {
   const alvo = new Date(d + "T00:00:00");
@@ -61,7 +71,7 @@ function diasAte(d: string, hoje: Date) {
 export function calcularAlertas(mans: Manutencao[], km: (veiculoId: string) => number | null, hoje = new Date()): Alerta[] {
   const ultima = new Map<string, Manutencao>();
   for (const m of mans) {
-    if (m.proximaKm == null && !m.proximaData) continue;
+    if (m.proximaKm == null && !m.proximaData && m.proximaHoras == null) continue;
     const k = `${m.veiculoId}|${m.tipo.toLowerCase()}`;
     const atual = ultima.get(k);
     if (!atual || m.data > atual.data || (m.data === atual.data && m.createdAt > atual.createdAt)) ultima.set(k, m);
@@ -70,11 +80,13 @@ export function calcularAlertas(mans: Manutencao[], km: (veiculoId: string) => n
   for (const m of ultima.values()) {
     const kmAtual = km(m.veiculoId);
     const faltamKm = m.proximaKm != null && kmAtual != null ? m.proximaKm - kmAtual : null;
+    const hAtual = horasConhecidas(m.veiculoId, mans);
+    const faltamHoras = m.proximaHoras != null && hAtual != null ? m.proximaHoras - hAtual : null;
     const faltamDias = m.proximaData ? diasAte(m.proximaData, hoje) : null;
     let status: StatusAlerta | null = null;
-    if ((faltamKm != null && faltamKm < 0) || (faltamDias != null && faltamDias < 0)) status = "atrasada";
-    else if ((faltamKm != null && faltamKm <= ALERTA_KM) || (faltamDias != null && faltamDias <= ALERTA_DIAS)) status = "a_vencer";
-    if (status) out.push({ manutencao: m, status, faltamKm, faltamDias });
+    if ((faltamKm != null && faltamKm < 0) || (faltamHoras != null && faltamHoras < 0) || (faltamDias != null && faltamDias < 0)) status = "atrasada";
+    else if ((faltamKm != null && faltamKm <= ALERTA_KM) || (faltamHoras != null && faltamHoras <= ALERTA_HORAS) || (faltamDias != null && faltamDias <= ALERTA_DIAS)) status = "a_vencer";
+    if (status) out.push({ manutencao: m, status, faltamKm, faltamDias, faltamHoras });
   }
   return out.sort((a, b) => (a.status === b.status ? 0 : a.status === "atrasada" ? -1 : 1));
 }
@@ -87,6 +99,7 @@ export function useFrota() {
       id: r.id, veiculoId: r.veiculo_id, data: r.data, km: num(r.km), tipo: r.tipo ?? "", descricao: r.descricao ?? "",
       fornecedor: r.fornecedor ?? "", valor: Number(r.valor ?? 0), proximaKm: num(r.proxima_km),
       proximaData: r.proxima_data ?? null, observacao: r.observacao ?? "", createdAt: new Date(r.created_at).getTime(),
+      medida: r.medida === "horas" ? "horas" : "km", horimetro: num(r.horimetro), proximaHoras: num(r.proxima_horas),
     })),
   });
   const qa = useQuery({
@@ -107,8 +120,9 @@ export function useFrota() {
 
   const salvarManutencao = useCallback(async (m: ManutencaoInput, id?: string) => {
     const row = {
-      veiculo_id: m.veiculoId, data: m.data, km: m.km, tipo: m.tipo, descricao: m.descricao, fornecedor: m.fornecedor,
+      veiculo_id: m.veiculoId, data: m.data, tipo: m.tipo, descricao: m.descricao, fornecedor: m.fornecedor,
       valor: m.valor, proxima_km: m.proximaKm, proxima_data: m.proximaData || null, observacao: m.observacao,
+      km: m.medida === "horas" ? null : m.km, medida: m.medida, horimetro: m.medida === "horas" ? m.horimetro : null, proxima_horas: m.medida === "horas" ? m.proximaHoras : null,
     };
     if (id) {
       const { error } = await sb.from("manutencoes").update(row).eq("id", id);
@@ -137,3 +151,5 @@ export function useFrota() {
 }
 
 export const fmtKm = (v: number | null) => (v == null ? "—" : `${v.toLocaleString("pt-BR")} km`);
+
+export const fmtHoras = (v: number | null) => (v == null ? "—" : `${v.toLocaleString("pt-BR")} h`);
