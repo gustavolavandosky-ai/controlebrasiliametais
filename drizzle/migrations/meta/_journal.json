@@ -43,6 +43,13 @@
       "when": 1793975409657,
       "tag": "0005_manutencao_por_horas",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793975680192,
+      "tag": "0006_corrige_trigger_km_manutencao",
+      "breakpoints": true
     }
   ]
 }
