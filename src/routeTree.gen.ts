@@ -18,9 +18,11 @@ import { Route as AuthenticatedBagsRouteImport } from './routes/_authenticated/b
 import { Route as AuthenticatedDevolucoesRouteImport } from './routes/_authenticated/devolucoes'
 import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedTrajetosRouteImport } from './routes/_authenticated/trajetos'
 import { Route as AuthenticatedViagensRouteImport } from './routes/_authenticated/viagens'
 import { Route as AuthenticatedDiariasIndexRouteImport } from './routes/_authenticated/diarias.index'
 import { Route as AuthenticatedDiariasCadastrosRouteImport } from './routes/_authenticated/diarias.cadastros'
+import { Route as AuthenticatedDiariasTrocosRouteImport } from './routes/_authenticated/diarias.trocos'
 import { Route as AuthenticatedEpiIndexRouteImport } from './routes/_authenticated/epi.index'
 import { Route as AuthenticatedEpiEquipamentosRouteImport } from './routes/_authenticated/epi.equipamentos'
 import { Route as AuthenticatedFinanceiroIndexRouteImport } from './routes/_authenticated/financeiro.index'
@@ -75,6 +77,11 @@ const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTrajetosRoute = AuthenticatedTrajetosRouteImport.update({
+  id: '/trajetos',
+  path: '/trajetos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedViagensRoute = AuthenticatedViagensRouteImport.update({
   id: '/viagens',
   path: '/viagens',
@@ -90,6 +97,12 @@ const AuthenticatedDiariasCadastrosRoute =
   AuthenticatedDiariasCadastrosRouteImport.update({
     id: '/diarias/cadastros',
     path: '/diarias/cadastros',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDiariasTrocosRoute =
+  AuthenticatedDiariasTrocosRouteImport.update({
+    id: '/diarias/trocos',
+    path: '/diarias/trocos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEpiIndexRoute = AuthenticatedEpiIndexRouteImport.update({
@@ -146,8 +159,10 @@ export interface FileRoutesByFullPath {
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/trajetos': typeof AuthenticatedTrajetosRoute
   '/viagens': typeof AuthenticatedViagensRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/diarias/trocos': typeof AuthenticatedDiariasTrocosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
@@ -167,8 +182,10 @@ export interface FileRoutesByTo {
   '/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/produtos': typeof AuthenticatedProdutosRoute
+  '/trajetos': typeof AuthenticatedTrajetosRoute
   '/viagens': typeof AuthenticatedViagensRoute
   '/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/diarias/trocos': typeof AuthenticatedDiariasTrocosRoute
   '/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/produto/$id': typeof AuthenticatedProdutoIdRoute
@@ -190,8 +207,10 @@ export interface FileRoutesById {
   '/_authenticated/devolucoes': typeof AuthenticatedDevolucoesRoute
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/trajetos': typeof AuthenticatedTrajetosRoute
   '/_authenticated/viagens': typeof AuthenticatedViagensRoute
   '/_authenticated/diarias/cadastros': typeof AuthenticatedDiariasCadastrosRoute
+  '/_authenticated/diarias/trocos': typeof AuthenticatedDiariasTrocosRoute
   '/_authenticated/epi/equipamentos': typeof AuthenticatedEpiEquipamentosRoute
   '/_authenticated/financeiro/$id': typeof AuthenticatedFinanceiroIdRoute
   '/_authenticated/produto/$id': typeof AuthenticatedProdutoIdRoute
@@ -213,8 +232,10 @@ export interface FileRouteTypes {
     | '/devolucoes'
     | '/estoque'
     | '/produtos'
+    | '/trajetos'
     | '/viagens'
     | '/diarias/cadastros'
+    | '/diarias/trocos'
     | '/epi/equipamentos'
     | '/financeiro/$id'
     | '/produto/$id'
@@ -234,8 +255,10 @@ export interface FileRouteTypes {
     | '/devolucoes'
     | '/estoque'
     | '/produtos'
+    | '/trajetos'
     | '/viagens'
     | '/diarias/cadastros'
+    | '/diarias/trocos'
     | '/epi/equipamentos'
     | '/financeiro/$id'
     | '/produto/$id'
@@ -256,8 +279,10 @@ export interface FileRouteTypes {
     | '/_authenticated/devolucoes'
     | '/_authenticated/estoque'
     | '/_authenticated/produtos'
+    | '/_authenticated/trajetos'
     | '/_authenticated/viagens'
     | '/_authenticated/diarias/cadastros'
+    | '/_authenticated/diarias/trocos'
     | '/_authenticated/epi/equipamentos'
     | '/_authenticated/financeiro/$id'
     | '/_authenticated/produto/$id'
@@ -340,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trajetos': {
+      id: '/_authenticated/trajetos'
+      path: '/trajetos'
+      fullPath: '/trajetos'
+      preLoaderRoute: typeof AuthenticatedTrajetosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/viagens': {
       id: '/_authenticated/viagens'
       path: '/viagens'
@@ -359,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/diarias/cadastros'
       fullPath: '/diarias/cadastros'
       preLoaderRoute: typeof AuthenticatedDiariasCadastrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diarias/trocos': {
+      id: '/_authenticated/diarias/trocos'
+      path: '/diarias/trocos'
+      fullPath: '/diarias/trocos'
+      preLoaderRoute: typeof AuthenticatedDiariasTrocosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/epi/': {
@@ -427,8 +466,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDevolucoesRoute: typeof AuthenticatedDevolucoesRoute
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedTrajetosRoute: typeof AuthenticatedTrajetosRoute
   AuthenticatedViagensRoute: typeof AuthenticatedViagensRoute
   AuthenticatedDiariasCadastrosRoute: typeof AuthenticatedDiariasCadastrosRoute
+  AuthenticatedDiariasTrocosRoute: typeof AuthenticatedDiariasTrocosRoute
   AuthenticatedEpiEquipamentosRoute: typeof AuthenticatedEpiEquipamentosRoute
   AuthenticatedFinanceiroIdRoute: typeof AuthenticatedFinanceiroIdRoute
   AuthenticatedProdutoIdRoute: typeof AuthenticatedProdutoIdRoute
@@ -447,8 +488,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDevolucoesRoute: AuthenticatedDevolucoesRoute,
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedTrajetosRoute: AuthenticatedTrajetosRoute,
   AuthenticatedViagensRoute: AuthenticatedViagensRoute,
   AuthenticatedDiariasCadastrosRoute: AuthenticatedDiariasCadastrosRoute,
+  AuthenticatedDiariasTrocosRoute: AuthenticatedDiariasTrocosRoute,
   AuthenticatedEpiEquipamentosRoute: AuthenticatedEpiEquipamentosRoute,
   AuthenticatedFinanceiroIdRoute: AuthenticatedFinanceiroIdRoute,
   AuthenticatedProdutoIdRoute: AuthenticatedProdutoIdRoute,

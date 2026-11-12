@@ -50,6 +50,13 @@
       "when": 1793975680192,
       "tag": "0006_corrige_trigger_km_manutencao",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794487779748,
+      "tag": "0007_troco_descontos",
+      "breakpoints": true
     }
   ]
 }

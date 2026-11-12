@@ -804,6 +804,42 @@ export type Database = {
         }
         Relationships: []
       }
+      troco_descontos: {
+        Row: {
+          colaborador: string
+          created_at: string
+          data: string
+          forma: string
+          id: string
+          observacao: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          colaborador: string
+          created_at?: string
+          data?: string
+          forma?: string
+          id?: string
+          observacao?: string
+          updated_at?: string
+          user_id: string
+          valor: number
+        }
+        Update: {
+          colaborador?: string
+          created_at?: string
+          data?: string
+          forma?: string
+          id?: string
+          observacao?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       unidades_apontamentos: {
         Row: {
           created_at: string

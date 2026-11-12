@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAccess } from "@/hooks/use-access";
-import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel, Wallet, Menu, Route, Truck } from "lucide-react";
+import { LogOut, Users, Boxes, CalendarDays, Undo2, HardHat, ShoppingBag, Fuel, Wallet, Menu, Route, Truck, Plane } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const SETORES = [
@@ -17,7 +17,8 @@ const SETORES = [
   { to: "/abastecimento", label: "Abastecimento", Icon: Fuel },
   { to: "/financeiro", label: "Financeiro", Icon: Wallet },
   { to: "/veiculos", label: "Veículos", Icon: Truck },
-  { to: "/viagens", label: "Viagens", Icon: Route },
+  { to: "/trajetos", label: "Trajetos", Icon: Route },
+  { to: "/viagens", label: "Viagens", Icon: Plane },
 ] as const;
 
 

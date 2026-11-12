@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Coins } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
@@ -316,6 +317,12 @@ function DiariasPage() {
               <Button variant="outline" onClick={() => setImportOpen(true)}>
                 <Upload className="mr-2 h-4 w-4" />
                 Importar
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/diarias/trocos">
+                  <Coins className="mr-2 h-4 w-4" />
+                  Trocos
+                </Link>
               </Button>
               <Button asChild variant="outline">
                 <Link to="/diarias/cadastros">
