@@ -302,6 +302,7 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
+          veiculo_id: string | null
         }
         Insert: {
           colaborador: string
@@ -318,6 +319,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor?: number
+          veiculo_id?: string | null
         }
         Update: {
           colaborador?: string
@@ -334,8 +336,17 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
+          veiculo_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "diarias_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       empresa_config: {
         Row: {
@@ -930,6 +941,8 @@ export type Database = {
         Row: {
           chegada_em: string | null
           cliente_id: string | null
+          combustivel_estimado_litros: number | null
+          consumo_km_litro: number | null
           created_at: string
           data: string
           destino: string
@@ -946,15 +959,21 @@ export type Database = {
           pedagio_real: number | null
           saida_em: string | null
           saiu_empresa: boolean
+          tem_volta: boolean
           tempo_estimado_min: number | null
           tempo_real_min: number | null
+          tempo_volta_min: number | null
           updated_at: string
           user_id: string
           veiculo_id: string | null
+          volta_chegada_em: string | null
+          volta_saida_em: string | null
         }
         Insert: {
           chegada_em?: string | null
           cliente_id?: string | null
+          combustivel_estimado_litros?: number | null
+          consumo_km_litro?: number | null
           created_at?: string
           data?: string
           destino: string
@@ -971,15 +990,21 @@ export type Database = {
           pedagio_real?: number | null
           saida_em?: string | null
           saiu_empresa?: boolean
+          tem_volta?: boolean
           tempo_estimado_min?: number | null
           tempo_real_min?: number | null
+          tempo_volta_min?: number | null
           updated_at?: string
           user_id?: string
           veiculo_id?: string | null
+          volta_chegada_em?: string | null
+          volta_saida_em?: string | null
         }
         Update: {
           chegada_em?: string | null
           cliente_id?: string | null
+          combustivel_estimado_litros?: number | null
+          consumo_km_litro?: number | null
           created_at?: string
           data?: string
           destino?: string
@@ -996,11 +1021,15 @@ export type Database = {
           pedagio_real?: number | null
           saida_em?: string | null
           saiu_empresa?: boolean
+          tem_volta?: boolean
           tempo_estimado_min?: number | null
           tempo_real_min?: number | null
+          tempo_volta_min?: number | null
           updated_at?: string
           user_id?: string
           veiculo_id?: string | null
+          volta_chegada_em?: string | null
+          volta_saida_em?: string | null
         }
         Relationships: [
           {

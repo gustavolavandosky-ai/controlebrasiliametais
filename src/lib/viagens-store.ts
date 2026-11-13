@@ -8,6 +8,8 @@ export interface Viagem {
   tempoRealMin: number | null; observacao: string; createdAt: number;
   clienteId: string | null; saiuEmpresa: boolean; saidaEm: string | null; chegadaEm: string | null;
   houveParada: boolean; paradasQtd: number; paradasMin: number; paradasJustificativa: string;
+  temVolta: boolean; voltaSaidaEm: string | null; voltaChegadaEm: string | null;
+  tempoVoltaMin: number | null; consumoKmLitro: number | null; combustivelEstimadoLitros: number | null;
 }
 export type ViagemInput = Omit<Viagem, "id" | "createdAt">;
 export interface ClienteViagem { id: string; nome: string; endereco: string; observacao: string }
@@ -34,7 +36,10 @@ async function fetchViagens(): Promise<Viagem[]> {
     tempoRealMin: n(r.tempo_real_min), observacao: r.observacao ?? "", createdAt: new Date(r.created_at).getTime(),
     clienteId: r.cliente_id ?? null, saiuEmpresa: !!r.saiu_empresa, saidaEm: r.saida_em, chegadaEm: r.chegada_em,
     houveParada: !!r.houve_parada, paradasQtd: Number(r.paradas_qtd ?? 0), paradasMin: Number(r.paradas_min ?? 0),
-    paradasJustificativa: r.paradas_justificativa ?? "",
+    paradasJustificativa: r.paradas_justificativa ?? "", temVolta: !!r.tem_volta,
+    voltaSaidaEm: r.volta_saida_em ?? null, voltaChegadaEm: r.volta_chegada_em ?? null,
+    tempoVoltaMin: n(r.tempo_volta_min), consumoKmLitro: n(r.consumo_km_litro),
+    combustivelEstimadoLitros: n(r.combustivel_estimado_litros),
   }));
 }
 
@@ -44,7 +49,11 @@ const toRow = (v: ViagemInput) => ({
   observacao: v.observacao, cliente_id: v.clienteId, saiu_empresa: v.saiuEmpresa,
   saida_em: v.saidaEm, chegada_em: v.chegadaEm, houve_parada: v.houveParada,
   paradas_qtd: v.houveParada ? v.paradasQtd : 0, paradas_min: v.houveParada ? v.paradasMin : 0,
-  paradas_justificativa: v.houveParada ? v.paradasJustificativa : "",
+  paradas_justificativa: v.houveParada ? v.paradasJustificativa : "", tem_volta: v.temVolta,
+  volta_saida_em: v.temVolta ? v.voltaSaidaEm : null,
+  volta_chegada_em: v.temVolta ? v.voltaChegadaEm : null,
+  tempo_volta_min: v.temVolta ? v.tempoVoltaMin : null,
+  consumo_km_litro: v.consumoKmLitro, combustivel_estimado_litros: v.combustivelEstimadoLitros,
 });
 
 /** Minutos entre saída e chegada (datetime-local ou ISO). */
@@ -55,11 +64,31 @@ export function duracaoMin(saida: string | null, chegada: string | null): number
   return Math.round((b - a) / 60000);
 }
 
-/** Tempo rodando = real − paradas; diferença = rodando − estimado. */
-export function diferencaMin(v: Pick<Viagem, "tempoRealMin" | "tempoEstimadoMin" | "houveParada" | "paradasMin">) {
-  if (v.tempoRealMin == null || v.tempoEstimadoMin == null) return null;
-  const rodando = v.tempoRealMin - (v.houveParada ? v.paradasMin : 0);
-  return rodando - v.tempoEstimadoMin;
+export function tempoRealTotalMin(v: Pick<Viagem, "tempoRealMin" | "tempoVoltaMin" | "temVolta">) {
+  if (v.tempoRealMin == null || (v.temVolta && v.tempoVoltaMin == null)) return null;
+  return v.tempoRealMin + (v.temVolta ? (v.tempoVoltaMin ?? 0) : 0);
+}
+
+export function tempoEstimadoTotalMin(v: Pick<Viagem, "tempoEstimadoMin" | "temVolta">) {
+  return v.tempoEstimadoMin == null ? null : v.tempoEstimadoMin * (v.temVolta ? 2 : 1);
+}
+
+export function distanciaTotalKm(v: Pick<Viagem, "distanciaKm" | "temVolta">) {
+  return v.distanciaKm == null ? null : v.distanciaKm * (v.temVolta ? 2 : 1);
+}
+
+/** Estima litros pela distância total e pela média real de KM/L do caminhão. */
+export function calcularCombustivel(distanciaKm: number | null, consumoKmLitro: number | null, temVolta: boolean) {
+  if (distanciaKm == null || consumoKmLitro == null || distanciaKm < 0 || consumoKmLitro <= 0) return null;
+  return Math.round((distanciaTotalKm({ distanciaKm, temVolta })! / consumoKmLitro) * 100) / 100;
+}
+
+/** Tempo rodando = ida + volta − paradas; diferença = rodando − estimado total. */
+export function diferencaMin(v: Pick<Viagem, "tempoRealMin" | "tempoVoltaMin" | "temVolta" | "tempoEstimadoMin" | "houveParada" | "paradasMin">) {
+  const real = tempoRealTotalMin(v), estimado = tempoEstimadoTotalMin(v);
+  if (real == null || estimado == null) return null;
+  const rodando = real - (v.houveParada ? v.paradasMin : 0);
+  return rodando - estimado;
 }
 
 export function useViagens() {

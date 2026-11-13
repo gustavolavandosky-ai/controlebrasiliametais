@@ -83,6 +83,7 @@ export function DiariasImportDialog({
             tipo: String(get("tipo", "diária", "diaria") ?? "").trim().toUpperCase(),
             valor: num(get("valor")),
             destino: String(get("destino", "cliente") ?? "").trim().toUpperCase(),
+            veiculoId: null,
             situacao: (sit === "PAGO" ? "pago" : "pendente") as DiariaInput["situacao"],
             troco: String(trocoRaw ?? "").trim() === "" ? null : num(trocoRaw),
             observacao: String(get("observa") ?? "").trim(),

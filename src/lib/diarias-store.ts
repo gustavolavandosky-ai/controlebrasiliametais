@@ -12,6 +12,7 @@ export interface Diaria {
   tipo: string;
   valor: number;
   destino: string;
+  veiculoId: string | null;
   situacao: Situacao;
   troco: number | null;
   observacao: string;
@@ -100,6 +101,7 @@ async function fetchDiarias(): Promise<Diaria[]> {
     tipo: r.tipo ?? "",
     valor: Number(r.valor),
     destino: r.destino ?? "",
+    veiculoId: r.veiculo_id ?? null,
     situacao: (r.situacao === "pago" ? "pago" : "pendente") as Situacao,
     troco: r.troco === null || r.troco === undefined ? null : Number(r.troco),
     observacao: r.observacao ?? "",
@@ -199,6 +201,7 @@ export function useDiarias() {
     tipo: d.tipo,
     valor: d.valor,
     destino: d.destino,
+    veiculo_id: d.veiculoId,
     situacao: d.situacao,
     troco: d.troco,
     observacao: d.observacao ?? "",

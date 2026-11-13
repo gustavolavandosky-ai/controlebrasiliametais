@@ -57,6 +57,13 @@
       "when": 1794487779748,
       "tag": "0007_troco_descontos",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794540061644,
+      "tag": "0008_volta_consumo_e_caminhao_diarias",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,7 @@ import {
   type Situacao,
 } from "@/lib/diarias-store";
 import { toast } from "sonner";
+import { useAbastecimento } from "@/lib/abastecimento-store";
 
 interface Props {
   grupo: Diaria[] | null;
@@ -36,6 +37,7 @@ const SEM_EQUIPE = "__sem";
 
 export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
   const { colaboradores, tipos, destinos, equipes, salvarGrupo } = useDiarias();
+  const { veiculos } = useAbastecimento();
   const base = grupo?.[0] ?? null;
 
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
@@ -44,6 +46,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
   const [tipo, setTipo] = useState("");
   const [valor, setValor] = useState("");
   const [destino, setDestino] = useState("");
+  const [veiculoId, setVeiculoId] = useState("");
   const [situacao, setSituacao] = useState<Situacao>("pago");
   const [troco, setTroco] = useState("");
   const [observacao, setObservacao] = useState("");
@@ -57,6 +60,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
       setTipo(base.tipo);
       setValor(String(base.valor));
       setDestino(base.destino);
+      setVeiculoId(base.veiculoId ?? "");
       setSituacao(base.situacao);
       setTroco(base.troco === null ? "" : String(base.troco));
       setObservacao(base.observacao);
@@ -67,6 +71,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
       setTipo("");
       setValor("");
       setDestino("");
+      setVeiculoId("");
       setSituacao("pago");
       setTroco("");
       setObservacao("");
@@ -110,6 +115,7 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
       tipo,
       valor: v,
       destino,
+      veiculoId: veiculoId || null,
       situacao,
       troco: t !== null && isFinite(t) ? t : null,
       observacao,
@@ -240,6 +246,21 @@ export function DiariaSheet({ grupo, open, onOpenChange }: Props) {
                   <SelectItem key={d.id} value={d.nome}>
                     {d.nome}
                   </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="diaria-veiculo">Caminhão da viagem</Label>
+            <Select value={veiculoId || SEM_EQUIPE} onValueChange={(v) => setVeiculoId(v === SEM_EQUIPE ? "" : v)}>
+              <SelectTrigger id="diaria-veiculo">
+                <SelectValue placeholder="Opcional" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={SEM_EQUIPE}>Não informado</SelectItem>
+                {veiculos.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>{v.placa} · {v.modelo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

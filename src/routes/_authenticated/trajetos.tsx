@@ -9,20 +9,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2, Calculator, Clock, MapPin, PauseCircle, Plus, Route as RouteIcon, Search, Trash2 } from "lucide-react";
+import { Building2, Calculator, Clock, Fuel, MapPin, PauseCircle, Plus, Route as RouteIcon, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAccess } from "@/hooks/use-access";
-import { useAbastecimento } from "@/lib/abastecimento-store";
-import { diferencaMin, duracaoMin, fmtTempo, useViagens, type ViagemInput } from "@/lib/viagens-store";
+import { calcularMediaPorVeiculo, useAbastecimento } from "@/lib/abastecimento-store";
+import { calcularCombustivel, diferencaMin, distanciaTotalKm, duracaoMin, fmtTempo, tempoEstimadoTotalMin, tempoRealTotalMin, useViagens, type ViagemInput } from "@/lib/viagens-store";
 import { estimarRota } from "@/lib/rotas.functions";
 
 export const Route = createFileRoute("/_authenticated/trajetos")({
   head: () => ({
     meta: [
       { title: "Trajetos · Brasília Metais" },
-      { name: "description", content: "Trajetos dos caminhões com estimativa de tempo, paradas e tempo real." },
+      { name: "description", content: "Trajetos de ida e volta com estimativa de tempo, combustível, paradas e tempo real." },
       { property: "og:title", content: "Trajetos · Brasília Metais" },
-      { property: "og:description", content: "Estimativa de rota, paradas e tempo real das viagens." },
+      { property: "og:description", content: "Estimativa de rota, consumo, paradas e tempo real das viagens." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -37,9 +37,10 @@ const vazio = (): ViagemInput => ({
   data: hoje(), origem: "", destino: "", veiculoId: null, motorista: "", distanciaKm: null,
   tempoEstimadoMin: null, tempoRealMin: null, observacao: "", clienteId: null, saiuEmpresa: false,
   saidaEm: null, chegadaEm: null, houveParada: false, paradasQtd: 0, paradasMin: 0, paradasJustificativa: "",
+  temVolta: false, voltaSaidaEm: null, voltaChegadaEm: null, tempoVoltaMin: null,
+  consumoKmLitro: null, combustivelEstimadoLitros: null,
 });
 const numOuNull = (s: string) => (s.trim() === "" ? null : Number(s.replace(",", ".")));
-/** ISO -> valor de input datetime-local (hora local) */
 const toLocal = (iso: string | null) => {
   if (!iso) return "";
   const d = new Date(iso); const p = (x: number) => String(x).padStart(2, "0");
@@ -47,11 +48,12 @@ const toLocal = (iso: string | null) => {
 };
 const fromLocal = (s: string) => (s ? new Date(s).toISOString() : null);
 const fmtHora = (iso: string | null) => (iso ? new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "");
+const fmtNum = (v: number) => v.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 
 function ViagensPage() {
   const { somenteLeitura } = useAccess();
   const { viagens, carregando, salvar, excluir, clientes, salvarCliente, enderecoEmpresa, salvarEnderecoEmpresa } = useViagens();
-  const { veiculos } = useAbastecimento();
+  const { veiculos, abastecimentos } = useAbastecimento();
   const calcular = useServerFn(estimarRota);
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);
@@ -65,6 +67,7 @@ function ViagensPage() {
   const trava = useRef(false);
   const nomeV = useMemo(() => new Map(veiculos.map((v) => [v.id, `${v.modelo} ${v.placa}`.trim()])), [veiculos]);
   const nomeC = useMemo(() => new Map(clientes.map((c) => [c.id, c.nome])), [clientes]);
+  const medias = useMemo(() => calcularMediaPorVeiculo(abastecimentos), [abastecimentos]);
 
   const filtradas = useMemo(() => {
     const b = busca.trim().toLowerCase();
@@ -78,7 +81,7 @@ function ViagensPage() {
   const resumo = useMemo(() => {
     let km = 0, parado = 0, soma = 0, qtd = 0;
     for (const v of viagens) {
-      km += v.distanciaKm ?? 0; if (v.houveParada) parado += v.paradasMin;
+      km += distanciaTotalKm(v) ?? 0; if (v.houveParada) parado += v.paradasMin;
       const d = diferencaMin(v); if (d != null) { soma += d; qtd++; }
     }
     return { km, parado, dif: qtd ? soma / qtd : null };
@@ -91,6 +94,10 @@ function ViagensPage() {
   }
 
   const realMin = form ? duracaoMin(form.saidaEm, form.chegadaEm) : null;
+  const voltaMin = form?.temVolta ? duracaoMin(form.voltaSaidaEm, form.voltaChegadaEm) : null;
+  const realTotal = form ? tempoRealTotalMin({ ...form, tempoRealMin: realMin, tempoVoltaMin: voltaMin }) : null;
+  const consumoForm = form?.veiculoId ? medias.get(form.veiculoId) ?? null : null;
+  const litrosForm = form ? calcularCombustivel(form.distanciaKm, consumoForm, form.temVolta) : null;
   const destinoManual = !!form && !form.clienteId && form.destino.trim() !== "";
 
   async function onCalcular() {
@@ -107,7 +114,10 @@ function ViagensPage() {
   async function onSalvar() {
     if (!form || trava.current) return;
     if (!form.origem.trim() || !form.destino.trim()) { toast.error("Preencha origem e destino."); return; }
-    if (form.saidaEm && form.chegadaEm && realMin == null) { toast.error("A chegada precisa ser depois da saída."); return; }
+    if (form.saidaEm && form.chegadaEm && realMin == null) { toast.error("A chegada da ida precisa ser depois da saída."); return; }
+    if (form.temVolta && !!form.voltaSaidaEm !== !!form.voltaChegadaEm) { toast.error("Preencha a saída e a chegada da volta."); return; }
+    if (form.temVolta && form.voltaSaidaEm && form.voltaChegadaEm && voltaMin == null) { toast.error("A chegada da volta precisa ser depois da saída da volta."); return; }
+    if (form.temVolta && form.chegadaEm && form.voltaSaidaEm && new Date(form.voltaSaidaEm) < new Date(form.chegadaEm)) { toast.error("A saída da volta precisa ser depois da chegada da ida."); return; }
     if (novoCli && destinoManual && !cliNome.trim()) { toast.error("Informe o nome do cliente."); return; }
     trava.current = true; setSalvando(true);
     try {
@@ -115,7 +125,7 @@ function ViagensPage() {
       if (novoCli && destinoManual) {
         clienteId = await salvarCliente({ nome: cliNome.trim(), endereco: form.destino.trim(), observacao: cliObs.trim() });
       }
-      await salvar({ ...form, clienteId, tempoRealMin: realMin }, editId);
+      await salvar({ ...form, clienteId, tempoRealMin: realMin, tempoVoltaMin: voltaMin, consumoKmLitro: consumoForm, combustivelEstimadoLitros: litrosForm }, editId);
       toast.success("Viagem salva"); setForm(null);
     } catch (e: any) { toast.error(e?.message ?? "Erro ao salvar"); }
     finally { trava.current = false; setSalvando(false); }
@@ -133,7 +143,7 @@ function ViagensPage() {
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">
         <div className="grid gap-4 sm:grid-cols-4">
           <Card icon={<RouteIcon className="h-5 w-5" />} label="Viagens" value={String(viagens.length)} cor="var(--bag-retorno)" />
-          <Card icon={<MapPin className="h-5 w-5" />} label="KM estimados" value={`${resumo.km.toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km`} cor="var(--bag-entrada)" />
+          <Card icon={<MapPin className="h-5 w-5" />} label="KM estimados (ida + volta)" value={`${resumo.km.toLocaleString("pt-BR", { maximumFractionDigits: 0 })} km`} cor="var(--bag-entrada)" />
           <Card icon={<PauseCircle className="h-5 w-5" />} label="Tempo total parado" value={fmtTempo(resumo.parado)} cor="var(--bag-saida)" />
           <Card icon={<Clock className="h-5 w-5" />} label="Rodando x estimado (média)"
             value={resumo.dif == null ? "—" : `${resumo.dif > 0 ? "+" : resumo.dif < 0 ? "-" : ""}${fmtTempo(Math.abs(resumo.dif))}`}
@@ -154,9 +164,9 @@ function ViagensPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead><TableHead>Saída → Destino</TableHead><TableHead>Caminhão</TableHead>
-                <TableHead>Motorista</TableHead><TableHead className="text-right">Distância</TableHead>
-                <TableHead className="text-right">Estimado</TableHead><TableHead className="text-right">Real</TableHead>
+                <TableHead>Data</TableHead><TableHead>Saída → Destino</TableHead><TableHead>Caminhão / consumo</TableHead>
+                <TableHead>Motorista</TableHead><TableHead className="text-right">Distância total</TableHead>
+                <TableHead className="text-right">Estimado</TableHead><TableHead className="text-right">Real total</TableHead>
                 <TableHead>Paradas</TableHead>
               </TableRow>
             </TableHeader>
@@ -172,14 +182,17 @@ function ViagensPage() {
                     <TableCell className="max-w-80">
                       <div className="truncate">{v.saiuEmpresa ? "Empresa" : v.origem}</div>
                       <div className="truncate text-muted-foreground">→ {cli ? `${cli} · ` : ""}{v.destino}</div>
+                      {v.temVolta && <div className="text-xs text-muted-foreground">Ida e volta</div>}
                     </TableCell>
-                    <TableCell>{nomeV.get(v.veiculoId ?? "") ?? "—"}</TableCell>
+                    <TableCell>{nomeV.get(v.veiculoId ?? "") ?? "—"}
+                      {v.combustivelEstimadoLitros != null && <div className="text-xs text-muted-foreground">{fmtNum(v.combustivelEstimadoLitros)} L · {fmtNum(v.consumoKmLitro ?? 0)} km/L</div>}
+                    </TableCell>
                     <TableCell>{v.motorista || "—"}</TableCell>
-                    <TableCell className="text-right">{v.distanciaKm == null ? "—" : `${v.distanciaKm.toLocaleString("pt-BR")} km`}</TableCell>
-                    <TableCell className="text-right">{fmtTempo(v.tempoEstimadoMin)}</TableCell>
+                    <TableCell className="text-right">{distanciaTotalKm(v) == null ? "—" : `${fmtNum(distanciaTotalKm(v)!)} km`}</TableCell>
+                    <TableCell className="text-right">{fmtTempo(tempoEstimadoTotalMin(v))}</TableCell>
                     <TableCell className="text-right">
-                      {fmtTempo(v.tempoRealMin)}
-                      {v.saidaEm && v.chegadaEm && <div className="text-xs text-muted-foreground">{fmtHora(v.saidaEm)} → {fmtHora(v.chegadaEm)}</div>}
+                      {fmtTempo(tempoRealTotalMin(v))}
+                      {v.saidaEm && v.chegadaEm && <div className="text-xs text-muted-foreground">Ida {fmtTempo(v.tempoRealMin)}{v.temVolta ? ` · volta ${fmtTempo(v.tempoVoltaMin)}` : ""}</div>}
                       {d != null && d !== 0 && (
                         <div className="text-xs font-medium" style={{ color: d > 0 ? "var(--negativo)" : "var(--positivo)" }}>
                           {d > 0 ? "+" : "-"}{fmtTempo(Math.abs(d))}
@@ -275,19 +288,36 @@ function ViagensPage() {
               <div className="rounded-md border p-3">
                 <p className="mb-2 text-sm font-semibold">Estimativa</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Distância (km)</Label><Input value={form.distanciaKm ?? ""} onChange={(e) => setForm({ ...form, distanciaKm: numOuNull(e.target.value) })} /></div>
-                  <div><Label>Tempo (min)</Label><Input value={form.tempoEstimadoMin ?? ""} onChange={(e) => setForm({ ...form, tempoEstimadoMin: numOuNull(e.target.value) })} />
+                  <div><Label>Distância da ida (km)</Label><Input value={form.distanciaKm ?? ""} onChange={(e) => setForm({ ...form, distanciaKm: numOuNull(e.target.value) })} /></div>
+                  <div><Label>Tempo da ida (min)</Label><Input value={form.tempoEstimadoMin ?? ""} onChange={(e) => setForm({ ...form, tempoEstimadoMin: numOuNull(e.target.value) })} />
                     <p className="mt-1 text-xs text-muted-foreground">{fmtTempo(form.tempoEstimadoMin)}</p></div>
+                </div>
+                <div className="mt-3 flex items-start gap-2 rounded-md bg-muted p-3 text-sm">
+                  <Fuel className="mt-0.5 h-4 w-4" />
+                  <div>{consumoForm != null ? <><b>{fmtNum(consumoForm)} km/L</b> de média do caminhão · estimativa de <b>{litrosForm == null ? "—" : `${fmtNum(litrosForm)} litros`}</b>{form.temVolta ? " para ida e volta" : " para a ida"}.</> : "Selecione um caminhão com abastecimentos válidos para calcular os litros automaticamente."}</div>
                 </div>
               </div>
 
               <div className="rounded-md border p-3">
-                <p className="mb-2 text-sm font-semibold">Realizado</p>
+                <p className="mb-2 text-sm font-semibold">Realizado — ida</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>Saída</Label><Input type="datetime-local" value={toLocal(form.saidaEm)} onChange={(e) => setForm({ ...form, saidaEm: fromLocal(e.target.value) })} /></div>
                   <div><Label>Chegada no destino</Label><Input type="datetime-local" value={toLocal(form.chegadaEm)} onChange={(e) => setForm({ ...form, chegadaEm: fromLocal(e.target.value) })} /></div>
                 </div>
-                <p className="mt-2 text-sm">Duração: <b>{fmtTempo(realMin)}</b></p>
+                <p className="mt-2 text-sm">Duração da ida: <b>{fmtTempo(realMin)}</b></p>
+
+                <label className="mt-4 flex items-center gap-2 text-sm">
+                  <Checkbox checked={form.temVolta} onCheckedChange={(c) => setForm({ ...form, temVolta: c === true })} />Teve volta no mesmo trajeto
+                </label>
+                {form.temVolta && <div className="mt-3 rounded-md border p-3">
+                  <p className="mb-2 text-sm font-semibold">Realizado — volta</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label>Saída da volta</Label><Input type="datetime-local" value={toLocal(form.voltaSaidaEm)} onChange={(e) => setForm({ ...form, voltaSaidaEm: fromLocal(e.target.value) })} /></div>
+                    <div><Label>Chegada da volta</Label><Input type="datetime-local" value={toLocal(form.voltaChegadaEm)} onChange={(e) => setForm({ ...form, voltaChegadaEm: fromLocal(e.target.value) })} /></div>
+                  </div>
+                  <p className="mt-2 text-sm">Duração da volta: <b>{fmtTempo(voltaMin)}</b></p>
+                </div>}
+                <p className="mt-3 text-sm">Tempo real total: <b>{fmtTempo(realTotal)}</b> · Distância total: <b>{distanciaTotalKm(form) == null ? "—" : `${fmtNum(distanciaTotalKm(form)!)} km`}</b></p>
 
                 <label className="mt-3 flex items-center gap-2 text-sm">
                   <Checkbox checked={form.houveParada} onCheckedChange={(c) => setForm({ ...form, houveParada: c === true })} />Houve parada?
@@ -302,10 +332,10 @@ function ViagensPage() {
                     <div><Label>Justificativas</Label><Textarea placeholder="Ex.: almoço, abastecimento, fila de carga" value={form.paradasJustificativa} onChange={(e) => setForm({ ...form, paradasJustificativa: e.target.value })} /></div>
                   </div>
                 )}
-                {realMin != null && form.tempoEstimadoMin != null && (() => {
-                  const d = diferencaMin({ ...form, tempoRealMin: realMin });
+                {realTotal != null && form.tempoEstimadoMin != null && (() => {
+                  const d = diferencaMin({ ...form, tempoRealMin: realMin, tempoVoltaMin: voltaMin });
                   return d == null ? null : (
-                    <p className="mt-2 text-sm">Rodando: <b>{fmtTempo(realMin - (form.houveParada ? form.paradasMin : 0))}</b> · Diferença:{" "}
+                    <p className="mt-2 text-sm">Rodando: <b>{fmtTempo(realTotal - (form.houveParada ? form.paradasMin : 0))}</b> · Diferença:{" "}
                       <b style={{ color: d > 0 ? "var(--negativo)" : "var(--positivo)" }}>{d > 0 ? "+" : d < 0 ? "-" : ""}{fmtTempo(Math.abs(d))}</b></p>
                   );
                 })()}

@@ -70,6 +70,23 @@ export function calcularMedias(abs: Abastecimento[]) {
   return res;
 }
 
+/** Média ponderada do veículo: todos os KM válidos divididos pelos litros desses abastecimentos. */
+export function calcularMediaPorVeiculo(abs: Abastecimento[]) {
+  const medias = calcularMedias(abs);
+  const totais = new Map<string, { km: number; litros: number }>();
+  for (const a of abs) {
+    const m = medias.get(a.id);
+    if (m?.kmRodados == null || m.kmRodados <= 0 || a.litros <= 0) continue;
+    const t = totais.get(a.veiculoId) ?? { km: 0, litros: 0 };
+    t.km += m.kmRodados;
+    t.litros += a.litros;
+    totais.set(a.veiculoId, t);
+  }
+  const res = new Map<string, number>();
+  for (const [id, t] of totais) if (t.litros > 0) res.set(id, t.km / t.litros);
+  return res;
+}
+
 export function useAbastecimento() {
   const qc = useQueryClient();
   const qv = useQuery({ queryKey: KV, queryFn: async () => (await fetchPaged("veiculos")).map(mapV) });
